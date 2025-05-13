@@ -1,0 +1,167 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .splash {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom, #a3dbe8, #e8a3c4);
+  }
+
+  .splash h1 {
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+  }
+
+  /* onboarding */
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    text-align: center;
+  }
+
+  .container {
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: space-between; */
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .hero-img {
+    max-width: 60%;
+    height: auto;
+    margin-top: 5px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 20px 0;
+    color: #3c6255;
+  }
+
+  .button {
+    background: linear-gradient(to right, #a3dbe8, #e8a3c4);
+    color: white;
+    font-size: 1rem;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 30px;
+    margin-top: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .login-text {
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+
+  .login-text a {
+    color: #3c6255;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .login-text a:hover {
+    text-decoration: underline;
+  }
+
+  /* signup */
+ 
+
+  .form-container {
+    background: white;
+    padding: 80px 50px;
+    margin-bottom: 150px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    text-align: left;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(to right, #a3dbe8, #e8a3c4) border-box;
+  }
+
+  .signup-button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(to right, #a3dbe8, #e8a3c4);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .signup-button:hover {
+    opacity: 0.9;
+  }
+
+  /* login */
+
+  .login-button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(to right, #a3dbe8, #e8a3c4);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .login-button:hover {
+    opacity: 0.9;
+  }
+
+  .signup-text {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .signup-text a {
+    color: #3c6255;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .signup-text a:hover {
+    text-decoration: underline;
+  }

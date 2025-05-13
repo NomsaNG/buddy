@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            height: 1000px;
+            background-color: white;
+            border-radius: 40px;
+            /* overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); */
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            color: white;
+        }
+
+        .time {
+            font-weight: bold;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 200px;
+            border-radius: 10px;
+            margin-top: -10px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .back-button, .notification {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .content {
+            background-color: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: -20px;
+            padding: 30px 20px;
+            height: calc(100% - 130px);
+            overflow-y: auto;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .balance-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .balance-label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .add-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #3aa1af;
+            background-color: white;
+            color: #3aa1af;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            cursor: pointer;
+        }
+
+        .add-label {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-container {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: 30px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-option.active {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .expense-list {
+            margin-top: 20px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .expense-name {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .expense-amount {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: #e0c3fc;
+        }
+
+        .nav-item.active i {
+            color: #e0c3fc;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="phone-container">
+
+        
+        <div class="header">
+            <div class="back-button">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <h1>Expenses</h1>
+            <div class="notification">
+                <i class="far fa-bell"></i>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="balance-section">
+                <div class="balance-label">Total Balance</div>
+                <div class="balance-amount">R2,548.00</div>
+                
+                <a href="add-expenses.html" style="text-decoration: none;">
+                    <div class="add-button">
+                      <i class="fas fa-plus"></i>
+                    </div>
+                  </a>
+                  
+                <div class="add-label">Add</div>
+            </div>
+            
+            <div class="toggle-container">
+                <div class="toggle-option active">Essential</div>
+                <div class="toggle-option">Nice to have</div>
+            </div>
+            
+            <div class="expense-list">
+                <div class="expense-item">
+                    
+                    <!-- <div class="expense-name">Tithe</div>
+                    <div class="expense-amount">R1 300</div>
+                </div>
+                <div class="expense-item">
+                    <div class="expense-name">Rent</div>
+                    <div class="expense-amount">R2 500</div>
+                </div>
+                <div class="expense-item">
+                    <div class="expense-name">Groceries</div>
+                    <div class="expense-amount">R1 300</div>
+                </div>
+                <div class="expense-item">
+                    <div class="expense-name">Toiletries</div>
+                    <div class="expense-amount">R1 300</div>
+                </div>
+                <div class="expense-item">
+                    <div class="expense-name">Transport</div>
+                    <div class="expense-amount">R1 300</div>
+                </div> -->
+            </div>
+
+            <div class="nice-to-have">
+                <!-- <div class="expense-item">
+                    <div class="expense-name">Dining Out</div>
+                    <div class="expense-amount">R1 300</div>
+                </div>
+                <div class="expense-item">
+                    <div class="expense-name">Entertainment</div>
+                    <div class="expense-amount">R1 300</div>
+                </div>
+                <div class="expense-item">
+                    <div class="expense-name">Shopping</div>
+                    <div class="expense-amount">R1 300</div>
+                </div> -->
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="home.html" class="nav-item ">
+              <i class="fas fa-home"></i>
+              <span>Home</span>
+            </a>
+          
+            <a href="stats.html" class="nav-item ">
+              <i class="fas fa-chart-bar"></i>
+              <span>Stats</span>
+            </a>
+          
+            <a href="expenses.html" class="nav-item">
+              <i class="fa-solid fa-wallet"></i>
+              <span>Wallet</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+              <i class="fa-solid fa-user"></i>
+              <span>Profile</span>
+          </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.min.js"></script>
+    <script type="module">
+        import { db } from './database.js';
+        
+        const userId = parseInt(localStorage.getItem('loggedInUserId'), 10);
+
+        if (!userId) {
+        alert("User not logged in. Redirecting...");
+        window.location.href = "login.html"; 
+    }
+        // Step 2: Function to render expenses
+        async function renderExpenses() {
+            const essentialList = document.querySelector('.expense-list');
+            const niceList = document.querySelector('.nice-to-have');
+    
+            // // Clear existing items
+            // essentialList.innerHTML = '';
+            // niceList.innerHTML = '';
+    
+            // Fetch all expenses
+            try {
+            // Only fetch expenses for the logged-in user
+            const expenses = await db.finances.where('userId').equals(userId).toArray();
+
+            if (expenses.length === 0) {
+                essentialList.innerHTML = '<p>No expenses found.</p>';
+                return;
+            }
+
+            expenses.forEach(exp => {
+                const item = document.createElement('div');
+                item.classList.add('expense-item');
+                item.innerHTML = `
+                    <div class="expense-name">${exp.category}</div>
+                    <div class="expense-amount">R${exp.amount}</div>
+                `;
+
+                // If classification is 'Essential', append to the essential list
+                if (exp.classification === 'Essential') {
+                    essentialList.appendChild(item);
+                } 
+                // Otherwise, it should be 'Nice to have'
+                else if (exp.classification === 'Nice to have') {
+                    niceList.appendChild(item);
+                }
+            });
+        } catch (err) {
+            console.error("Failed to load expenses:", err);
+            alert("Error loading expenses.");
+        }
+    }
+
+    // Step 3: Toggle between categories
+    document.querySelectorAll('.toggle-option').forEach(option => {
+        option.addEventListener('click', function () {
+            document.querySelector('.toggle-option.active')?.classList.remove('active');
+            this.classList.add('active');
+
+            if (this.textContent.trim() === 'Essential') {
+                document.querySelector('.expense-list').style.display = 'block';
+                document.querySelector('.nice-to-have').style.display = 'none';
+            } else {
+                document.querySelector('.expense-list').style.display = 'none';
+                document.querySelector('.nice-to-have').style.display = 'block';
+            }
+        });
+    });
+
+    // Step 4: Initialize view
+    document.addEventListener('DOMContentLoaded', () => {
+        renderExpenses();
+        document.querySelector('.expense-list').style.display = 'block';
+        document.querySelector('.nice-to-have').style.display = 'none';
+    });
+</script>
+    
+</body>
+</html>

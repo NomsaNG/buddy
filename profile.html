@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buddy - Profile</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .profile-header {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      top: -89px;
+    }
+
+    .profile-header img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #3c6255;
+      background-color: aliceblue;
+    }
+
+    .profile-header h2 {
+      margin-top: 15px;
+      color: #3c6255;
+      font-size: 1.5rem;
+    }
+
+    .profile-header p {
+      margin-top: 5px;
+      color: #777;
+      font-size: 0.9rem;
+      
+    }
+
+    .settings {
+      margin-top: 30px;
+    }
+
+    .settings h3 {
+      
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    .setting-item {
+      
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      
+      display: flex;
+      /* gap: 29px; */
+      align-items: center;
+    }
+    .setting-item i {
+      font-size: 1.5rem;
+      color: #3c6255;
+    }
+
+    .setting-name {
+      color: #333;
+      font-weight: 500;
+      padding-left: 29px;
+      
+    }
+
+    .setting-name-1 {
+     
+      font-weight: 500;
+      padding-left: 23px;
+      
+    }
+
+    .logout-button {
+      
+      color: grey;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+
+    .logout-button:hover {
+      background-color: #d32f2f;
+    }
+
+    .invite-freinds {
+      display: flex;
+      gap: 160px;
+     
+    }
+
+    .top-bar {
+      position: relative;
+      display: flex;
+      overflow: hidden;
+      justify-content: space-between;
+      background: #f5f5f5;
+      align-items: center;
+      
+      margin-bottom: 20px;
+      z-index: 1;
+      
+    }
+    .top-bar::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 220px;
+      height: 150px;
+      display: flex;
+      justify-content: space-between;
+      background: linear-gradient(to right, #a3dbe8, #e8a3c4);
+      align-items: center;
+      border-radius: 50%;
+      transform-origin: bottom;
+      transform: translateX(-50%) scale(4);
+      z-index: -1;
+      
+     
+    }
+
+    .top-bar .greeting {
+      
+      padding-left: 180px;
+      padding-top: 50px;
+      padding-bottom: 100px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color:white;
+    }
+  </style>
+</head>
+<body>
+    <script src="https://kit.fontawesome.com/8190f54777.js" crossorigin="anonymous"></script>
+    <div class="top-bar">
+      <div class="greeting">Profile</div>
+     
+    </div>
+  <div class="container">
+    <div class="profile-header">
+      <img src="assets/profile.png" alt="Profile Picture" />
+      <h2>Nomsa Goba</h2>
+      <p>nomsagoba@email.com</p>
+    </div>
+
+    <div class="settings">
+        
+        <div class="invite-freinds">
+            <h3>Invite Friends</h3>
+            <a href="login.html" class="logout-button">Log Out</a>
+        </div>
+      
+      <hr>
+      <div class="setting-item">
+        <i class="fa-solid fa-user"></i>
+        <span class="setting-name">Account Info</span>
+      </div>
+      <div class="setting-item">
+        <i class="fa-solid fa-user-group"></i>
+        <span class="setting-name-1">Personal profile</span>
+      </div>
+      <div class="setting-item">
+        <i class="fa-solid fa-envelope-open-text"></i>
+        <span class="setting-name">Message center</span>
+      </div>
+      <div class="setting-item">
+        <i class="fa-solid fa-shield"></i>
+        <span class="setting-name">Login and security</span>
+      </div>
+      <div class="setting-item">
+        <i class="fa-solid fa-lock"></i>
+        <span class="setting-name">Data and privacy</span>
+      </div>
+    </div>
+    <!-- <a href="login.html" class="logout-button">Log Out</a> -->
+    <!-- <button class="logout-button">Log Out</button> -->
+  </div>
+
+  <div id="bottom-nav"></div>
+  <script>
+    fetch('bottom-nav.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('bottom-nav').innerHTML = html;
+      });
+  </script>
+</body>
+</html>

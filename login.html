@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <title>Buddy - Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.3/dist/dexie.min.js"></script>
+</head>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom right, #a3dbe8, #e8a3c4);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+<body>
+  <div class="form-container">
+    <h2>Login</h2>
+    <form id="login-form">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="email address" autocomplete="email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="password" autocomplete="current-password" required />
+
+      <button type="submit" class="button">Log In</button>
+    </form>
+
+    <div class="signup-text">
+      Don't have an account? <a href="signup.html">Sign Up</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.min.js"></script>
+  <script type="module">
+    import { db } from './database.js';
+
+    // Handle login form submission
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent form from refreshing the page
+
+      // Get form data
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        // Check if the user exists in the database
+        const user = await db.users.get({ email });
+
+        if (user && user.password === password) {
+        alert('Login successful!');
+        localStorage.setItem('loggedInUserEmail', email); // Store the logged-in user's email
+        localStorage.setItem('loggedInUserId', user.id);
+        // Redirect to home page
+        window.location.href = 'home.html'; // Redirect to home page
+      } else {
+        alert('Invalid email or password. Please try again.');
+      }
+      } catch (error) {
+        console.error('Error during login:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
