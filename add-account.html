@@ -216,7 +216,46 @@
         </div>
     </div>
 
+  
     
+    <script type="module">
+        import db from './database.js';
+      
+        // Simulate current user login
+        const currentUserId = parseInt(localStorage.getItem("loggedInUserId")); // Assume user ID is stored on login
+      
+        const addButton = document.getElementById('add-expense-btn');
+      
+        addButton.addEventListener('click', async () => {
+          const nameInput = document.querySelectorAll('#amount-input')[0];
+          const amountInput = document.querySelectorAll('#amount-input')[1];
+      
+          const name = nameInput.value.trim();
+          const amountStr = amountInput.value.trim().replace(/[^\d]/g, ''); // Remove non-numeric characters
+          const amount = parseFloat(amountStr);
+      
+          if (!name || isNaN(amount) || !currentUserId) {
+            alert("Please provide valid account name and amount.");
+            return;
+          }
+      
+          // Save to Dexie
+          await db.accounts.add({
+            userId: currentUserId,
+            name,
+            amount
+          });
+      
+          // Redirect to accounts page
+          window.location.href = 'accounts.html';
+        });
+      
+        // Clear button logic (optional)
+        document.getElementById('clear-amount').addEventListener('click', () => {
+          document.querySelectorAll('#amount-input')[1].value = '';
+        });
+      </script>
+         
       
 </body>
 </html>
