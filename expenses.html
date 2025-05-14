@@ -23,9 +23,8 @@
 
         .phone-container {
             width: 100%;
-            height: 1000px;
+            height: 100vh;
             background-color: white;
-            border-radius: 40px;
             /* overflow: hidden;
             position: relative;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); */
@@ -183,6 +182,7 @@
             color: #aaa;
             font-size: 12px;
             cursor: pointer;
+            margin-bottom: 5px;
         }
 
         .nav-item i {
@@ -205,9 +205,11 @@
 
         
         <div class="header">
-            <div class="back-button">
-                <i class="fas fa-chevron-left"></i>
-            </div>
+            <a href="home.html" style="text-decoration: none;">
+                <div class="back-button">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+            </a>
             <h1>Expenses</h1>
             <div class="notification">
                 <i class="far fa-bell"></i>
@@ -234,7 +236,7 @@
             </div>
             
             <div class="expense-list">
-                <div class="expense-item">
+                <div class="expense-item"> </div>
                     
                     <!-- <div class="expense-name">Tithe</div>
                     <div class="expense-amount">R1 300</div>
@@ -258,6 +260,10 @@
             </div>
 
             <div class="nice-to-have">
+                <div class="expense-item">
+                    <!-- <div class="expense-name">Dining Out</div>
+                    <div class="expense-amount">R1 300</div> -->
+                </div>
                 <!-- <div class="expense-item">
                     <div class="expense-name">Dining Out</div>
                     <div class="expense-amount">R1 300</div>
@@ -273,25 +279,14 @@
             </div>
         </div>
         
-        <div class="navigation">
-            <a href="home.html" class="nav-item ">
-              <i class="fas fa-home"></i>
-              <span>Home</span>
-            </a>
-          
-            <a href="stats.html" class="nav-item ">
-              <i class="fas fa-chart-bar"></i>
-              <span>Stats</span>
-            </a>
-          
-            <a href="expenses.html" class="nav-item">
-              <i class="fa-solid fa-wallet"></i>
-              <span>Wallet</span>
-            </a>
-            <a href="profile.html" class="nav-item">
-              <i class="fa-solid fa-user"></i>
-              <span>Profile</span>
-          </div>
+        <div id="bottom-nav"></div>
+        <script>
+            fetch('bottom-nav.html')
+              .then(res => res.text())
+              .then(html => {
+                document.getElementById('bottom-nav').innerHTML = html;
+              });
+          </script>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.min.js"></script>

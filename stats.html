@@ -1,217 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Buddy - Stats</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #f5f5f5;
-    }
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    .container {
-      padding: 20px;
-    }
+        .phone-container {
+            width: 100%;
+            height: 100vh;
+            background-color: white;
+            /* border-radius: 40px; */
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
 
-    h2 {
-      color: #3c6255;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+        .header {
+            padding: 50px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .summary-cards {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 30px;
-      gap: 10px;
-    }
+        .back-button, .export-button {
+            font-size: 20px;
+            cursor: pointer;
+            color: #333;
+        }
 
-    .card {
-      flex: 1;
-      padding: 20px;
-      border-radius: 15px;
-      
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .time-period {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .period-tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .period-tab.active {
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            color: white;
+            font-weight: 500;
+        }
+
+        .filter-dropdown {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chart-container {
+            padding: 0 20px;
+            position: relative;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #3aa1af;
+            font-weight: 600;
+            top: 80px;
+            left: 160px;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+
+        .months {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 30px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .top-spending {
+            padding: 0 20px;
+        }
+
+        .top-spending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .top-spending-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .sort-button {
+            color: #888;
+            cursor: pointer;
+        }
+
+        .spending-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .spending-item:last-child {
+            border-bottom: none;
+        }
+
+        .spending-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .spending-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spending-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .spending-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spending-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .spending-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .spending-amount {
+            color: #ff6b6b;
+            font-weight: 500;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+            
+
+        }
 
 
-    .card h3 {
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
 
-    .card p {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
 
-    .chart-container {
-      margin-top: 20px;
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
+        .nav-item.active {
+            color: #e0c3fc;
+        }
 
-    canvas {
-      width: 100% !important;
-      height: auto !important;
-    }
-    .top-spending {
-      margin-top: 30px;
-      /* background: white; */
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .top-spending h3 {
-      color: #3c6255;
-      margin-bottom: 10px;
-    }
-    .transactions {
-      margin-top: 20px;
-    }
-    .transaction-item {
-      background: white;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    .transaction-details {
-      display: flex;
-      flex-direction: column;
-    }
-    .transaction-name {
-      font-size: 1rem;
-      color: #333;
-    }
-    .transaction-date {
-      font-size: 0.8rem;
-      color: #888;
-    }
-    .transaction-amount {
-      font-size: 1rem;
-      font-weight: bold;
-      color: #3c6255;
-    }
-    .transaction-amount span {
-      font-size: 0.8rem;
-      color: #888;
-    }
-    .transaction-amount span:hover {
-      color: #3c6255;
-      cursor: pointer;
-    }
-    .transaction-amount:hover {
-      color: #3c6255;
-      cursor: pointer;
-    }
-    .transaction-amount:hover span {
-      color: #3c6255;
-      cursor: pointer;
-    }
- 
+        .nav-item.active i {
+            color: #e0c3fc;
+        }
 
-  </style>
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            border-radius: 50%;
+            position: absolute;
+            top: 90px;
+            left: 215px;
+        }
+
+        .vertical-line {
+            position: absolute;
+            top: 100px;
+            left: 215px;
+            height: 100px;
+            border-left: 1px dashed #aaa;
+        }
+    </style>
 </head>
 <body>
-<script src="https://kit.fontawesome.com/8190f54777.js" crossorigin="anonymous"></script>
-
-  <div class="container">
-    <h2>Financial Statistics</h2>
-
-    <div class="summary-cards">
-      <div class="card">
-        <h3>Day</h3>
+    <div class="phone-container">
+        <div class="header">
+            <div class="back-button">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <h1>Statistics</h1>
+            <div class="export-button">
+                <i class="fas fa-share-alt"></i>
+            </div>
+        </div>
         
-      </div>
-      <div class="card">
-        <h3>Week</h3>
-      </div>
-      <div class="card">
-        <h3>Month</h3>
-      </div>
-      <div class="card">
-        <h3>Year</h3>
-      </div>
+        <div class="time-period">
+            <div class="period-tab active">Day</div>
+            <div class="period-tab">Week</div>
+            <div class="period-tab">Month</div>
+            <div class="period-tab">Year</div>
+        </div>
+        
+        <div class="filter-dropdown">
+            <div class="dropdown">
+                <span>Expense</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="expense-chart"></canvas>
+            <div class="tooltip">R1,230</div>
+            <div class="dot"></div>
+            <div class="vertical-line"></div>
+        </div>
+        
+        <div class="months">
+            <span>Mar</span>
+            <span>Apr</span>
+            <span>May</span>
+            <span>Jun</span>
+            <span>Jul</span>
+            <span>Aug</span>
+            <span>Sep</span>
+        </div>
+        
+        <div class="top-spending">
+            <div class="top-spending-header">
+                <div class="top-spending-title">Top Spending</div>
+                <div class="sort-button">
+                    <i class="fas fa-sort"></i>
+                </div>
+            </div>
+            
+            <div class="spending-item">
+                <div class="spending-info">
+                    <div class="spending-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1200px-Starbucks_Corporation_Logo_2011.svg.png" alt="Starbucks">
+                    </div>
+                    <div class="spending-details">
+                        <div class="spending-name">Starbucks</div>
+                        <div class="spending-date">Jan 12, 2022</div>
+                    </div>
+                </div>
+                <div class="spending-amount">- R 150.00</div>
+            </div>
+            
+            <div class="spending-item">
+                <div class="spending-info">
+                    <div class="spending-logo gradient-bg">
+                        <img src="" alt="Profile">
+                    </div>
+                    <div class="spending-details">
+                        <div class="spending-name">Transfer</div>
+                        <div class="spending-date">Yesterday</div>
+                    </div>
+                </div>
+                <div class="spending-amount">- R 85.00</div>
+            </div>
+            
+            <div class="spending-item">
+                <div class="spending-info">
+                    <div class="spending-logo" style="background-color: #FF0000;">
+                        <i class="fab fa-youtube" style="color: white; font-size: 20px;"></i>
+                    </div>
+                    <div class="spending-details">
+                        <div class="spending-name">Youtube</div>
+                        <div class="spending-date">Jan 16, 2022</div>
+                    </div>
+                </div>
+                <div class="spending-amount">- R 11.99</div>
+            </div>
+        </div>
+        
+        <div class="navigation">
+          <a href="home.html" class="nav-item ">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+          </a>
+        
+          <a href="stats.html" class="nav-item ">
+            <i class="fas fa-chart-bar"></i>
+            <span>Stats</span>
+          </a>
+        
+          <a href="expenses.html" class="nav-item">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Wallet</span>
+          </a>
+          <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+        </div>
     </div>
 
-
-
-    <div class="chart-container">
-      <canvas id="expenseChart"></canvas>
-    </div>
-  </div>
-
-  <div class="top-spending">
-    <h3>Top Spending</h3>
-    <div class="transactions">
-      <div class="transaction-item">
-        <div class="transaction-details">
-          <span class="transaction-name">Groceries</span>
-          <span class="transaction-date">2023-10-01</span>
-        </div>
-        <span class="transaction-amount">R500</span>
-      </div>
-      <div class="transaction-item">
-        <div class="transaction-details">
-          <span class="transaction-name">Transport</span>
-          <span class="transaction-date">2023-10-02</span>
-        </div>
-        <span class="transaction-amount">R1000</span>
-      </div>
-</div>
-
-  <div id="bottom-nav"></div>
-  <script>
-    fetch('bottom-nav.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('bottom-nav').innerHTML = html;
-      });
-  </script>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const ctx = document.getElementById('expenseChart').getContext('2d');
-    const expenseChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Groceries', 'Transport', 'Bills', 'Entertainment'],
-        datasets: [{
-          label: 'Expenses',
-          data: [50, 1000, 1200, 800],
-          backgroundColor: [
-            '#72c28c',
-            '#f5b9b9',
-            '#a3dbe8',
-            '#e8a3c4'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-          }
+    <script>
+        // Draw the expense chart
+        function drawChart() {
+            const canvas = document.getElementById('expense-chart');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas dimensions
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = canvas.offsetHeight * 2;
+            ctx.scale(2, 2); // Scale for retina displays
+            
+            // Chart data points
+            const data = [
+                { x: 0, y: 80 },
+                { x: 30, y: 60 },
+                { x: 60, y: 90 },
+                { x: 90, y: 70 },
+                { x: 120, y: 50 },
+                { x: 150, y: 60 },
+                { x: 180, y: 40 },
+                { x: 210, y: 60 },
+                { x: 240, y: 30 },
+                { x: 270, y: 50 },
+                { x: 300, y: 70 }
+            ];
+            
+            // Draw the curve
+            ctx.beginPath();
+            ctx.moveTo(data[0].x, data[0].y);
+            
+            // Create a smooth curve through the points
+            for (let i = 0; i < data.length - 1; i++) {
+                const xc = (data[i].x + data[i + 1].x) / 2;
+                const yc = (data[i].y + data[i + 1].y) / 2;
+                ctx.quadraticCurveTo(data[i].x, data[i].y, xc, yc);
+            }
+            
+            // Add the last point
+            ctx.quadraticCurveTo(
+                data[data.length - 2].x, 
+                data[data.length - 2].y, 
+                data[data.length - 1].x, 
+                data[data.length - 1].y
+            );
+            
+            // Style the line
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#a78bfa';
+            ctx.stroke();
+            
+            // Create gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(167, 139, 250, 0.3)');
+            gradient.addColorStop(1, 'rgba(167, 139, 250, 0)');
+            
+            // Fill the area under the curve
+            ctx.lineTo(data[data.length - 1].x, 200);
+            ctx.lineTo(data[0].x, 200);
+            ctx.fillStyle = gradient;
+            ctx.fill();
         }
-      }
-    });
-  </script>
+        
+        // Initialize the chart when the page loads
+        window.addEventListener('load', drawChart);
+        window.addEventListener('resize', drawChart);
+        
+        // Time period tabs functionality
+        document.querySelectorAll('.period-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelector('.period-tab.active').classList.remove('active');
+                this.classList.add('active');
+                // In a real app, this would update the chart data
+            });
+        });
+        
+        // Dropdown functionality
+        document.querySelector('.dropdown').addEventListener('click', function() {
+            alert('Filter options: Expense, Income, Savings');
+        });
+        
+        // Export button functionality
+        document.querySelector('.export-button').addEventListener('click', function() {
+            alert('Export statistics as PDF or share with others');
+        });
+        
+        // Back button functionality
+        document.querySelector('.back-button').addEventListener('click', function() {
+            alert('Navigate back to dashboard');
+        });
+        
+        // Navigation functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (!this.classList.contains('active')) {
+                    document.querySelector('.nav-item.active').classList.remove('active');
+                    this.classList.add('active');
+                    alert(`Navigate to ${this.querySelector('span').textContent}`);
+                }
+            });
+        });
+        
+        // Sort button functionality
+        document.querySelector('.sort-button').addEventListener('click', function() {
+            alert('Sort by: Amount (High to Low), Date (Recent first), Name (A-Z)');
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Breakdown</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 50px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .back-button, .notification-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            background-color: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: 20px;
+            padding: 30px 20px;
+            height: calc(100% - 90px);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .toggle-container {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: 30px;
+            padding: 5px;
+            margin-bottom: 30px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-option.active {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .add-button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .add-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #3aa1af;
+            background-color: white;
+            color: #3aa1af;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .add-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Accounts View Styles */
+        .accounts-view {
+            display: none;
+        }
+
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .account-card {
+            background-color: #ffd1dc;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .account-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #3aa1af;
+            font-size: 20px;
+        }
+
+        .account-name {
+            font-size: 18px;
+            color: #3aa1af;
+        }
+
+        .account-balance {
+            font-size: 18px;
+            color: #3aa1af;
+            font-weight: 500;
+        }
+
+        /* Saving Goal View Styles */
+        .saving-goal-view {
+            display: block;
+            text-align: center;
+        }
+
+        .goal-target {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .goal-container {
+            /* position: relative; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .bottle-container {
+            /* position: relative; */
+            width: 200px;
+            height: 350px;
+            margin: 0 auto;
+            padding-bottom:  5px;
+            display: flex;
+        
+        }
+
+        .bottle-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .goal-name {
+            font-size: 20px;
+            font-weight: 500;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .goal-progress {
+            /* position: absolute; */
+            /* left: 0; */
+            display: flex;
+            align-items: center;
+            margin-top: 120px;
+            width: 150px;
+        }
+
+        .progress-amount {
+            font-size: 18px;
+            font-weight: 500;
+            color: #ff6b6b;
+            margin-right: 10px;
+        }
+
+        .progress-arrow {
+            color: #ff6b6b;
+            font-size: 24px;
+        }
+
+        .goal-navigation {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .goal-nav-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666;
+            font-size: 18px;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .show-more {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: #e0c3fc;
+        }
+
+        .nav-item.active i {
+            color: #e0c3fc;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .modal-button {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cancel-button {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .add-item-button {
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="header">
+            <a href="home.html">
+                <div class="back-button">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+            </a>
+            <h1>Balance Breakdown</h1>
+            <div class="notification-button">
+                <i class="far fa-bell"></i>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="toggle-container">
+                <div class="toggle-option active" id="saving-goal-tab">Saving Goal</div>
+                <div class="toggle-option" id="accounts-tab">Accounts</div>
+            </div>
+            
+            <div class="add-button-container">
+                <div class="add-button" id="add-button">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="add-label">Add</div>
+            </div>
+            
+            <!-- Saving Goal View -->
+            <div class="saving-goal-view" id="saving-goal-view">
+                <div class="goal-target">R 50 000</div>
+                
+                <div class="goal-container">
+                    <div class="goal-navigation">
+                        <div class="goal-nav-button" id="prev-goal">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                        <div class="goal-nav-button" id="next-goal">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bottle-container">
+                       
+                        <div class="goal-progress">
+                            <div class="progress-amount">R 3000</div>
+                            <div class="progress-arrow">→</div>
+                        </div>
+
+                        <div><img src="assets/bottle.jpg" alt="Savings Bottle" class="bottle-image"></div>
+                    </div>
+                </div>
+                
+                <div class="goal-name">Car</div>
+            </div>
+            
+            <!-- Accounts View -->
+            <div class="accounts-view" id="accounts-view">
+                <div class="accounts-list" id="accounts-list">
+                    <div class="account-card">
+                        <div class="account-info">
+                            <div class="account-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="account-name">Bank (FNB)</div>
+                        </div>
+                        <div class="account-balance">R 1000</div>
+                    </div>
+                    
+                    <div class="account-card">
+                        <div class="account-info">
+                            <div class="account-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="account-name">AltCoinTrader</div>
+                        </div>
+                        <div class="account-balance">R 4000</div>
+                    </div>
+                    
+                    <div class="account-card">
+                        <div class="account-info">
+                            <div class="account-icon">
+                                <i class="fab fa-paypal"></i>
+                            </div>
+                            <div class="account-name">Paypal</div>
+                        </div>
+                        <div class="account-balance">R 200</div>
+                    </div>
+                </div>
+                
+                <div class="show-more">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+        
+    <div id="bottom-nav"></div>
+    <script>
+        fetch('bottom-nav.html')
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById('bottom-nav').innerHTML = html;
+        });
+    </script>
+
+    </div>
+    
+    <!-- Add Account Modal -->
+    <div class="modal" id="add-account-modal">
+        <div class="modal-content">
+            <div class="modal-title">Add New Account</div>
+            
+            <div class="form-group">
+                <label class="form-label">Account Name</label>
+                <input type="text" class="form-input" id="account-name-input" placeholder="Enter account name">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Account Type</label>
+                <select class="form-select" id="account-type-input">
+                    <option value="Bank">Bank Account</option>
+                    <option value="Credit">Credit Card</option>
+                    <option value="Investment">Investment</option>
+                    <option value="Crypto">Cryptocurrency</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Balance (R)</label>
+                <input type="number" class="form-input" id="account-balance-input" placeholder="0.00">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" id="cancel-add-account">Cancel</button>
+                <button class="modal-button add-item-button" id="confirm-add-account">Add Account</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Saving Goal Modal -->
+    <div class="modal" id="add-goal-modal">
+        <div class="modal-content">
+            <div class="modal-title">Add New Saving Goal</div>
+            
+            <div class="form-group">
+                <label class="form-label">Goal Name</label>
+                <input type="text" class="form-input" id="goal-name-input" placeholder="Enter goal name">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Target Amount (R)</label>
+                <input type="number" class="form-input" id="goal-target-input" placeholder="0.00">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Savings (R)</label>
+                <input type="number" class="form-input" id="goal-current-input" placeholder="0.00">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Target Date</label>
+                <input type="date" class="form-input" id="goal-date-input">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" id="cancel-add-goal">Cancel</button>
+                <button class="modal-button add-item-button" id="confirm-add-goal">Add Goal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample accounts data
+        const accounts = [
+            { id: 1, name: 'Bank (FNB)', type: 'Bank', icon: 'university', balance: 1000 },
+            { id: 2, name: 'AltCoinTrader', type: 'Crypto', icon: 'dollar-sign', balance: 4000 },
+            { id: 3, name: 'Paypal', type: 'Other', icon: 'paypal', balance: 200 }
+        ];
+        
+        // Sample saving goals data
+        const savingGoals = [
+            { id: 1, name: 'Car', target: 50000, current: 3000, date: '2025-12-31' },
+            { id: 2, name: 'Vacation', target: 15000, current: 5000, date: '2025-06-30' },
+            { id: 3, name: 'Emergency Fund', target: 30000, current: 10000, date: '2025-09-30' }
+        ];
+        
+        // Current view state and current goal index
+        let currentView = 'saving-goal';
+        let currentGoalIndex = 0;
+        
+        // Initialize the app
+        function init() {
+            renderAccounts();
+            updateSavingGoalView();
+            
+            // Tab switching
+            document.getElementById('saving-goal-tab').addEventListener('click', function() {
+                if (currentView !== 'saving-goal') {
+                    currentView = 'saving-goal';
+                    document.getElementById('accounts-tab').classList.remove('active');
+                    this.classList.add('active');
+                    document.getElementById('saving-goal-view').style.display = 'block';
+                    document.getElementById('accounts-view').style.display = 'none';
+                    updateSavingGoalView();
+                }
+            });
+            
+            document.getElementById('accounts-tab').addEventListener('click', function() {
+                if (currentView !== 'accounts') {
+                    currentView = 'accounts';
+                    document.getElementById('saving-goal-tab').classList.remove('active');
+                    this.classList.add('active');
+                    document.getElementById('saving-goal-view').style.display = 'none';
+                    document.getElementById('accounts-view').style.display = 'block';
+                }
+            });
+            
+            // Add button
+            document.getElementById('add-button').addEventListener('click', function() {
+                if (currentView === 'saving-goal') {
+                    document.getElementById('add-goal-modal').style.display = 'flex';
+                } else {
+                    document.getElementById('add-account-modal').style.display = 'flex';
+                }
+            });
+            
+            // Goal navigation
+            document.getElementById('prev-goal').addEventListener('click', function() {
+                if (currentGoalIndex > 0) {
+                    currentGoalIndex--;
+                } else {
+                    currentGoalIndex = savingGoals.length - 1;
+                }
+                updateSavingGoalView();
+            });
+            
+            document.getElementById('next-goal').addEventListener('click', function() {
+                if (currentGoalIndex < savingGoals.length - 1) {
+                    currentGoalIndex++;
+                } else {
+                    currentGoalIndex = 0;
+                }
+                updateSavingGoalView();
+            });
+            
+            // Account modal buttons
+            document.getElementById('cancel-add-account').addEventListener('click', function() {
+                document.getElementById('add-account-modal').style.display = 'none';
+                resetAccountModalForm();
+            });
+            
+            document.getElementById('confirm-add-account').addEventListener('click', function() {
+                const name = document.getElementById('account-name-input').value.trim();
+                const type = document.getElementById('account-type-input').value;
+                const balance = document.getElementById('account-balance-input').value;
+                
+                if (name && balance) {
+                    addAccount(name, type, parseFloat(balance));
+                    document.getElementById('add-account-modal').style.display = 'none';
+                    resetAccountModalForm();
+                } else {
+                    alert('Please fill in all required fields');
+                }
+            });
+            
+            // Goal modal buttons
+            document.getElementById('cancel-add-goal').addEventListener('click', function() {
+                document.getElementById('add-goal-modal').style.display = 'none';
+                resetGoalModalForm();
+            });
+            
+            document.getElementById('confirm-add-goal').addEventListener('click', function() {
+                const name = document.getElementById('goal-name-input').value.trim();
+                const target = document.getElementById('goal-target-input').value;
+                const current = document.getElementById('goal-current-input').value;
+                const date = document.getElementById('goal-date-input').value;
+                
+                if (name && target && current && date) {
+                    addSavingGoal(name, parseFloat(target), parseFloat(current), date);
+                    document.getElementById('add-goal-modal').style.display = 'none';
+                    resetGoalModalForm();
+                } else {
+                    alert('Please fill in all required fields');
+                }
+            });
+            
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (!this.classList.contains('active')) {
+                        document.querySelector('.nav-item.active').classList.remove('active');
+                        this.classList.add('active');
+                        alert(`Navigate to ${this.querySelector('span').textContent}`);
+                    }
+                });
+            });
+            
+            // Back button
+            document.querySelector('.back-button').addEventListener('click', function() {
+                alert('Navigate back to dashboard');
+            });
+            
+            // Show more button
+            document.querySelector('.show-more').addEventListener('click', function() {
+                alert('Show more accounts');
+            });
+        }
+        
+        // Update saving goal view
+        function updateSavingGoalView() {
+            if (savingGoals.length === 0) {
+                document.getElementById('saving-goal-view').innerHTML = `
+                    <p style="text-align: center; color: #888; margin-top: 30px;">
+                        No saving goals yet. Click the Add button to create one.
+                    </p>
+                `;
+                return;
+            }
+            
+            const goal = savingGoals[currentGoalIndex];
+            const progressPercentage = (goal.current / goal.target) * 100;
+            const bottomPosition = Math.min(Math.max(progressPercentage, 5), 95); // Keep between 5% and 95% for visibility
+            
+            document.querySelector('.goal-target').textContent = `R ${goal.target.toLocaleString()}`;
+            document.querySelector('.goal-name').textContent = goal.name;
+            document.querySelector('.progress-amount').textContent = `R ${goal.current.toLocaleString()}`;
+            document.querySelector('.goal-progress').style.bottom = `${bottomPosition}%`;
+        }
+        
+        // Render accounts
+        function renderAccounts() {
+            const accountsList = document.getElementById('accounts-list');
+            accountsList.innerHTML = '';
+            
+            if (accounts.length === 0) {
+                accountsList.innerHTML = `
+                    <p style="text-align: center; color: #888; margin-top: 30px;">
+                        No accounts yet. Click the Add button to add one.
+                    </p>
+                `;
+                return;
+            }
+            
+            accounts.forEach(account => {
+                const accountCard = document.createElement('div');
+                accountCard.className = 'account-card';
+                
+                let iconClass = 'fas fa-university'; // Default icon
+                
+                // Set icon based on account type
+                switch(account.type) {
+                    case 'Bank':
+                        iconClass = 'fas fa-university';
+                        break;
+                    case 'Credit':
+                        iconClass = 'fas fa-credit-card';
+                        break;
+                    case 'Investment':
+                        iconClass = 'fas fa-chart-line';
+                        break;
+                    case 'Crypto':
+                        iconClass = 'fas fa-dollar-sign';
+                        break;
+                    case 'Cash':
+                        iconClass = 'fas fa-money-bill-wave';
+                        break;
+                    default:
+                        if (account.name.toLowerCase().includes('paypal')) {
+                            iconClass = 'fab fa-paypal';
+                        }
+                }
+                
+                accountCard.innerHTML = `
+                    <div class="account-info">
+                        <div class="account-icon">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="account-name">${account.name}</div>
+                    </div>
+                    <div class="account-balance">R ${account.balance.toLocaleString()}</div>
+                `;
+                
+                accountsList.appendChild(accountCard);
+            });
+        }
+        
+        // Add new account
+        function addAccount(name, type, balance) {
+            const newId = accounts.length > 0 ? Math.max(...accounts.map(account => account.id)) + 1 : 1;
+            
+            let icon = 'university'; // Default icon
+            
+            // Set icon based on account type
+            switch(type) {
+                case 'Bank':
+                    icon = 'university';
+                    break;
+                case 'Credit':
+                    icon = 'credit-card';
+                    break;
+                case 'Investment':
+                    icon = 'chart-line';
+                    break;
+                case 'Crypto':
+                    icon = 'dollar-sign';
+                    break;
+                case 'Cash':
+                    icon = 'money-bill-wave';
+                    break;
+                default:
+                    if (name.toLowerCase().includes('paypal')) {
+                        icon = 'paypal';
+                    }
+            }
+            
+            accounts.push({
+                id: newId,
+                name,
+                type,
+                icon,
+                balance
+            });
+            
+            renderAccounts();
+        }
+        
+        // Add new saving goal
+        function addSavingGoal(name, target, current, date) {
+            const newId = savingGoals.length > 0 ? Math.max(...savingGoals.map(goal => goal.id)) + 1 : 1;
+            
+            savingGoals.push({
+                id: newId,
+                name,
+                target,
+                current,
+                date
+            });
+            
+            currentGoalIndex = savingGoals.length - 1;
+            updateSavingGoalView();
+        }
+        
+        // Reset account modal form
+        function resetAccountModalForm() {
+            document.getElementById('account-name-input').value = '';
+            document.getElementById('account-type-input').value = 'Bank';
+            document.getElementById('account-balance-input').value = '';
+        }
+        
+        // Reset goal modal form
+        function resetGoalModalForm() {
+            document.getElementById('goal-name-input').value = '';
+            document.getElementById('goal-target-input').value = '';
+            document.getElementById('goal-current-input').value = '';
+            document.getElementById('goal-date-input').value = '';
+        }
+        
+        // Initialize when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

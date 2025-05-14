@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            /* border-radius: 40px; */
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            
+        }
+
+        .header {
+            padding: 50px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .back-button, .notification-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content {
+            background-color: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: 20px;
+            padding: 40px 20px;
+            height: calc(100% - 90px);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .balance-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .balance-label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .add-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #3aa1af;
+            background-color: white;
+            color: #3aa1af;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            cursor: pointer;
+        }
+
+        .add-label {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .toggle-container {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: 30px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-option.active {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .shopping-list {
+            margin-top: 20px;
+        }
+
+        .shopping-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #3aa1af;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .checkbox.checked {
+            background-color: #3aa1af;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .item-name.crossed {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .item-category {
+            font-size: 12px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .item-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-price {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .delete-button {
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .delete-button:hover {
+            color: #ff6b6b;
+        }
+
+        .high-priority {
+            color: #ff6b6b;
+        }
+
+        .low-priority {
+            color: #3aa1af;
+        }
+
+        .navigation {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: #e0c3fc;
+        }
+
+        .nav-item.active i {
+            color: #e0c3fc;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .modal-button {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cancel-button {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .add-item-button {
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="header">
+            <a href="home.html" style="text-decoration: none;">
+                <div class="back-button">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+            </a>
+            <h1>Shopping</h1>
+            <div class="notification-button">
+                <i class="far fa-bell"></i>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="balance-section">
+                <div class="balance-label">Total Balance</div>
+                <div class="balance-amount">R 2,548.00</div>
+                
+                <div class="add-button" id="add-shopping-btn">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="add-label">Add</div>
+            </div>
+            
+            <div class="toggle-container">
+                <div class="toggle-option active" id="to-buy-tab">To Buy</div>
+                <div class="toggle-option" id="purchased-tab">Purchased</div>
+            </div>
+            
+            <div class="shopping-list" id="shopping-list">
+                <!-- Shopping items will be added here dynamically -->
+            </div>
+        </div>
+        
+        <div id="bottom-nav"></div>
+        <script>
+            fetch('bottom-nav.html')
+              .then(res => res.text())
+              .then(html => {
+                document.getElementById('bottom-nav').innerHTML = html;
+              });
+          </script>
+    </div>
+    
+    <!-- Add Item Modal -->
+    <div class="modal" id="add-item-modal">
+        <div class="modal-content">
+            <div class="modal-title">Add Shopping Item</div>
+            
+            <div class="form-group">
+                <label class="form-label">Item Name</label>
+                <input type="text" class="form-input" id="item-name-input" placeholder="Enter item name">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-select" id="item-category-input">
+                    <option value="Groceries">Groceries</option>
+                    <option value="Household">Household</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select class="form-select" id="item-priority-input">
+                    <option value="High">High Priority</option>
+                    <option value="Low">Low Priority</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Price (R)</label>
+                <input type="number" class="form-input" id="item-price-input" placeholder="0.00">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button cancel-button" id="cancel-add-item">Cancel</button>
+                <button class="modal-button add-item-button" id="confirm-add-item">Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample shopping items
+        const shoppingItems = [
+            { id: 1, name: 'Cheese', category: 'Groceries', priority: 'High', price: 59.99, purchased: true },
+            { id: 2, name: 'Juice', category: 'Groceries', priority: 'Low', price: 19.99, purchased: false },
+            { id: 3, name: 'Yogurt', category: 'Groceries', priority: 'High', price: 19.99, purchased: false },
+            { id: 4, name: 'Toothpaste', category: 'Groceries', priority: 'High', price: 19.99, purchased: false }
+        ];
+        
+        // Current view state
+        let currentView = 'to-buy';
+        
+        // Render shopping list based on current view
+        function renderShoppingList() {
+            const shoppingListElement = document.getElementById('shopping-list');
+            shoppingListElement.innerHTML = '';
+            
+            const filteredItems = shoppingItems.filter(item => {
+                if (currentView === 'to-buy') {
+                    return !item.purchased;
+                } else {
+                    return item.purchased;
+                }
+            });
+            
+            if (filteredItems.length === 0) {
+                shoppingListElement.innerHTML = `
+                    <p style="text-align: center; color: #888; margin-top: 30px;">
+                        No items ${currentView === 'to-buy' ? 'to buy' : 'purchased'} yet.
+                    </p>
+                `;
+                return;
+            }
+            
+            filteredItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'shopping-item';
+                itemElement.dataset.id = item.id;
+                
+                itemElement.innerHTML = `
+                    <div class="item-left">
+                        <div class="checkbox ${item.purchased ? 'checked' : ''}" data-id="${item.id}">
+                            ${item.purchased ? '<i class="fas fa-check"></i>' : ''}
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name ${item.purchased ? 'crossed' : ''}">${item.name}</div>
+                            <div class="item-category">
+                                ${item.category} . <span class="${item.priority === 'High' ? 'high-priority' : 'low-priority'}">${item.priority} Priority</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-price">R ${item.price.toFixed(2)}</div>
+                        <div class="delete-button" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </div>
+                `;
+                
+                shoppingListElement.appendChild(itemElement);
+            });
+            
+            // Add event listeners to checkboxes and delete buttons
+            document.querySelectorAll('.checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', toggleItemPurchased);
+            });
+            
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', deleteItem);
+            });
+        }
+        
+        // Toggle item purchased state
+        function toggleItemPurchased() {
+            const itemId = parseInt(this.dataset.id);
+            const item = shoppingItems.find(item => item.id === itemId);
+            
+            if (item) {
+                item.purchased = !item.purchased;
+                renderShoppingList();
+            }
+        }
+        
+        // Delete item
+        function deleteItem() {
+            const itemId = parseInt(this.dataset.id);
+            const itemIndex = shoppingItems.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                shoppingItems.splice(itemIndex, 1);
+                renderShoppingList();
+            }
+        }
+        
+        // Add new item
+        function addItem(name, category, priority, price) {
+            const newId = shoppingItems.length > 0 ? Math.max(...shoppingItems.map(item => item.id)) + 1 : 1;
+            
+            shoppingItems.push({
+                id: newId,
+                name,
+                category,
+                priority,
+                price: parseFloat(price),
+                purchased: false
+            });
+            
+            renderShoppingList();
+        }
+        
+        // Initialize the app
+        function init() {
+            // Render initial shopping list
+            renderShoppingList();
+            
+            // Tab switching
+            document.getElementById('to-buy-tab').addEventListener('click', function() {
+                if (currentView !== 'to-buy') {
+                    currentView = 'to-buy';
+                    document.getElementById('purchased-tab').classList.remove('active');
+                    this.classList.add('active');
+                    renderShoppingList();
+                }
+            });
+            
+            document.getElementById('purchased-tab').addEventListener('click', function() {
+                if (currentView !== 'purchased') {
+                    currentView = 'purchased';
+                    document.getElementById('to-buy-tab').classList.remove('active');
+                    this.classList.add('active');
+                    renderShoppingList();
+                }
+            });
+            
+            // Add item button
+            document.getElementById('add-shopping-btn').addEventListener('click', function() {
+                document.getElementById('add-item-modal').style.display = 'flex';
+            });
+            
+            // Modal cancel button
+            document.getElementById('cancel-add-item').addEventListener('click', function() {
+                document.getElementById('add-item-modal').style.display = 'none';
+                resetModalForm();
+            });
+            
+            // Modal add item button
+            document.getElementById('confirm-add-item').addEventListener('click', function() {
+                const name = document.getElementById('item-name-input').value.trim();
+                const category = document.getElementById('item-category-input').value;
+                const priority = document.getElementById('item-priority-input').value;
+                const price = document.getElementById('item-price-input').value;
+                
+                if (name && price) {
+                    addItem(name, category, priority, price);
+                    document.getElementById('add-item-modal').style.display = 'none';
+                    resetModalForm();
+                } else {
+                    alert('Please fill in all required fields');
+                }
+            });
+            
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (!this.classList.contains('active')) {
+                        document.querySelector('.nav-item.active').classList.remove('active');
+                        this.classList.add('active');
+                        alert(`Navigate to ${this.querySelector('span').textContent}`);
+                    }
+                });
+            });
+            
+            // Back button
+            document.querySelector('.back-button').addEventListener('click', function() {
+                alert('Navigate back to dashboard');
+            });
+        }
+        
+        // Reset modal form
+        function resetModalForm() {
+            document.getElementById('item-name-input').value = '';
+            document.getElementById('item-category-input').value = 'Groceries';
+            document.getElementById('item-priority-input').value = 'High';
+            document.getElementById('item-price-input').value = '';
+        }
+        
+        // Initialize when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

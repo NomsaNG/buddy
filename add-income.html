@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Income</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 50px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .back-button, .menu-button {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .menu-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .menu-dot {
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .form-container {
+            background-color: white;
+            border-radius: 30px 30px 0 0;
+            margin-top: 20px;
+            padding: 40px 20px;
+            height: calc(100% - 90px);
+            position: relative;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            color: #888;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+        }
+
+        .form-input.date-input {
+            cursor: pointer;
+        }
+
+        .form-input input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .form-input .calendar-icon {
+            color: #888;
+            cursor: pointer;
+        }
+
+        .add-button {
+            position: absolute;
+            bottom: 40px;
+            left: 20px;
+            right: 20px;
+            padding: 18px;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* Gradient border for input fields */
+        .gradient-border {
+            position: relative;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+            border-radius: 16px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="header">
+            <a href="home.html">
+                <div class="back-button">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+            </a>
+            <h1>Add Income</h1>
+            <div class="menu-button">
+                <div class="menu-dots">
+                    <div class="menu-dot"></div>
+                    <div class="menu-dot"></div>
+                    <div class="menu-dot"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <div class="form-group">
+                <label class="form-label">Name</label>
+                <div class="gradient-border">
+                    <div class="form-input">
+                        <input type="text" placeholder="Enter income source" id="name-input">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <div class="gradient-border">
+                    <div class="form-input">
+                        <input type="text" placeholder="Enter amount" id="amount-input">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Occurance</label>
+                <div class="gradient-border">
+                    <div class="form-input date-input" id="date-input">
+                        <span>Tue, 22 Feb 2022</span>
+                        <i class="fas fa-calendar-alt calendar-icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="add-button" id="add-income-btn">
+                Add
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Input field focus effects
+        const inputFields = document.querySelectorAll('.form-input input');
+        inputFields.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.parentElement.classList.add('active');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.parentElement.classList.remove('active');
+            });
+        });
+
+        // Date picker functionality
+        document.getElementById('date-input').addEventListener('click', function() {
+            // In a real app, this would open a date picker
+            alert('Open date picker');
+        });
+
+        // Add income button
+        document.getElementById('add-income-btn').addEventListener('click', function() {
+            const name = document.getElementById('name-input').value || 'Untitled';
+            const amount = document.getElementById('amount-input').value || '0.00';
+            const date = document.querySelector('.date-input span').textContent;
+            
+            // Validate inputs
+            if (!document.getElementById('name-input').value) {
+                alert('Please enter an income source name');
+                return;
+            }
+            
+            if (!document.getElementById('amount-input').value) {
+                alert('Please enter an amount');
+                return;
+            }
+            
+            alert(`Income added:\nName: ${name}\nAmount: R ${amount}\nDate: ${date}`);
+            
+            // In a real app, this would save the data and redirect back to the main screen
+            console.log({
+                name,
+                amount: `R ${amount}`,
+                date
+            });
+            
+            // Reset form
+            document.getElementById('name-input').value = '';
+            document.getElementById('amount-input').value = '';
+        });
+
+        // Back button functionality
+        document.querySelector('.back-button').addEventListener('click', function() {
+            alert('Navigate back to income list');
+        });
+
+        // Menu button functionality
+        document.querySelector('.menu-button').addEventListener('click', function() {
+            alert('Open options menu');
+        });
+        
+        // Format amount as currency when user types
+        document.getElementById('amount-input').addEventListener('input', function(e) {
+            // Remove any non-numeric characters
+            let value = this.value.replace(/[^0-9.]/g, '');
+            
+            // Ensure only one decimal point
+            const decimalPoints = value.match(/\./g);
+            if (decimalPoints && decimalPoints.length > 1) {
+                const parts = value.split('.');
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            // Format with two decimal places if there's a decimal point
+            if (value.includes('.')) {
+                const parts = value.split('.');
+                if (parts[1].length > 2) {
+                    parts[1] = parts[1].substring(0, 2);
+                    value = parts.join('.');
+                }
+            }
+            
+            this.value = value;
+        });
+    </script>
+</body>
+</html>

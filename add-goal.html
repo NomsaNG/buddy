@@ -23,7 +23,7 @@
 
         .phone-container {
             width: 100%;
-            height: 912px;
+            height: 100vh;
             background: linear-gradient(135deg, #8ecae6, #e0c3fc);
             overflow: hidden;
             position: relative;
@@ -178,7 +178,7 @@
 <body>
     <div class="phone-container">
         <div class="header">
-            <a href="expenses.html">
+            <a href="accounts.html">
                 <div class="back-button">
                     <i class="fas fa-chevron-left"></i>
                 </div>
@@ -194,46 +194,25 @@
         </div>
         
         <div class="form-container">
+
             <div class="form-group">
-                <label class="form-label">Category</label>
-                <div class="form-input dropdown" id="category-dropdown">
-                    <span id="selected-category">Tithe</span>
-                    <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div id="category-options" style="display: none; margin-top: 10px;">
-                    <div class="category-option" data-category="Tithe">Tithe</div>
-                    <div class="category-option" data-category="Rent">Rent</div>
-                    <div class="category-option" data-category="Groceries">Groceries</div>
-                    <div class="category-option" data-category="Toiletries">Toiletries</div>
-                    <div class="category-option" data-category="Transport">Transport</div>
-                    <div class="category-option" data-category="Dining Out">Dining Out</div>
-                    <div class="category-option" data-category="Entertainment">Entertainment</div>
-                    <div class="category-option" data-category="Shopping">Shopping</div>
+                <label class="form-label">Name</label>
+                <div class="form-input">
+                    <input type="text" value="House" id="amount-input">
                 </div>
             </div>
             
             <div class="form-group">
                 <label class="form-label">Amount</label>
                 <div class="form-input">
-                    <input type="text" value="R 48.00" id="amount-input">
+                    <input type="text" value="R 2 800 000" id="amount-input">
                     <span class="clear-btn" id="clear-amount">Clear</span>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">Classification</label>
-                <div class="form-input dropdown" id="classification-dropdown">
-                    <span id="selected-classification">Essential</span>
-                    <i class="fas fa-chevron-down dropdown-icon"></i>
-                </div>
-                <div id="classification-options" style="display: none; margin-top: 10px;">
-                    <div class="classification-option" data-classification="Essential">Essential</div>
-                    <div class="classification-option" data-classification="Nice to have">Nice to have</div>
-                </div>
-            </div>
 
             <div class="form-group">
-                <label class="form-label">Date</label>
+                <label class="form-label">Expected End Date</label>
                 <div class="form-input">
                     <input type="date" id="date-input" value="">
                 </div>
@@ -244,85 +223,8 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.min.js"></script>
-    <script type="module">
-        import { db } from './database.js';
-        // Set default date to today's date
-        const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-        document.getElementById('date-input').value = today;
-
-        // Clear amount input
-        document.getElementById('clear-amount').addEventListener('click', () => {
-          document.getElementById('amount-input').value = '';
-        });
-      
-        // Add expense
-        document.getElementById('add-expense-btn').addEventListener('click', async () => {
-          const category = document.getElementById('selected-category').textContent;
-          const amount = document.getElementById('amount-input').value;
-          const classification = document.getElementById('selected-classification').textContent;
-          const date = document.getElementById('date-input').value;
-      
-          if (!amount || isNaN(parseFloat(amount))) {
-            alert("Please enter a valid amount.");
-            return;
-          }
-          // Get the currently logged-in user's ID
-          const userId = parseInt(localStorage.getItem('loggedInUserId'), 10);
-          if (!userId) {
-          alert("User not logged in. Please log in first.");
-          window.location.href = "login.html"; // Change to login page
-          return;
-          }
-
-          try {
-            await db.finances.add({
-              userId, // Add userId to the expense
-              category,
-              amount: parseFloat(amount.replace(/[^\d.-]/g, '')), // Clean "R 48.00" to 48.00
-              classification,
-              date
-            });
-      
-            alert('Expense saved successfully!');
-            window.location.href = 'expenses.html'; // Redirect if needed
-          } catch (err) {
-            console.error("Error saving expense:", err);
-            alert("Failed to save expense.");
-          }
-        });
-
-        // Toggle classification dropdown
-    document.getElementById('classification-dropdown').addEventListener('click', () => {
-        const options = document.getElementById('classification-options');
-        options.style.display = options.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // Select a classification
-    document.querySelectorAll('.classification-option').forEach(option => {
-        option.addEventListener('click', () => {
-            const selectedclassification = option.getAttribute('data-classification');
-            document.getElementById('selected-classification').textContent = selectedclassification;
-            document.getElementById('classification-options').style.display = 'none';
-        });
-    });
-
-        // Toggle category dropdown
-    document.getElementById('category-dropdown').addEventListener('click', () => {
-        const options = document.getElementById('category-options');
-        options.style.display = options.style.display === 'none' ? 'block' : 'none';
-    });
-
-    // Select a category
-    document.querySelectorAll('.category-option').forEach(option => {
-        option.addEventListener('click', () => {
-            const selectedCategory = option.getAttribute('data-category');
-            document.getElementById('selected-category').textContent = selectedCategory;
-            document.getElementById('category-options').style.display = 'none';
-        });
-    });
-      </script>
       
 </body>
 </html>
+
+<!-- Auto create an account for each goal when creating a goal -->
