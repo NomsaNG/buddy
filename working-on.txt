@@ -1,0 +1,9 @@
+Making the bottle dynamic - done
+
+
+
+
+Still to work on:
+
+Shopping when ticking off to decrement money from main account or cash (options)
+expenses page to display dynamic total balance

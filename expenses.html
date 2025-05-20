@@ -519,7 +519,7 @@
             await db.finances.add({ userId, category, amount, classification, date });
             alert("Expense added!");
             document.getElementById('add-expense-modal').style.display = 'none';
-            renderExpenses();
+            // renderExpenses();
         } catch (err) {
             console.error(err);
             alert("Error saving expense.");

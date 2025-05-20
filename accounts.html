@@ -366,9 +366,74 @@
         }
 
         .add-item-button {
-            background: linear-gradient(135deg, #8ecae6, #e0c3fc);
-            color: white;
+        background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+        color: white;
         }
+        .bottle-wrapper {
+        position: relative;
+        width: 100px;
+        height: 200px;
+        }
+
+        .bottle-image {
+        width: 100%;
+        height: 100%;
+        display: block;
+        }
+
+        .water-fill {
+        position: absolute;
+        bottom: 0;
+        left: 3px;
+        width: 90%;
+        background-color: rgba(0, 174, 239, 0.5); /* light blue */
+        height: 0%;
+        transition: height 0.5s ease-in-out;
+        z-index: 1;
+        border-radius: 0 0 15px 15px;
+        }
+
+        .bottle-wrapper img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        }
+
+        .goal-progress{
+            position: absolute;
+        }
+
+
+    /* .bottle-outer {
+        position: relative;
+        width: 100px;
+        height: 200px;
+    }
+
+    .bottle-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+    }
+
+    .bottle-water {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: rgba(0, 191, 255, 0.6);
+        z-index: 1;
+        transition: height 0.6s ease;
+        border-radius: 0 0 40px 40px;
+    }
+
+    .progress-arrow {
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: center;
+    } */
+
     </style>
 </head>
 <body>
@@ -400,6 +465,10 @@
             
             <!-- Saving Goal View -->
             <div class="saving-goal-view" id="saving-goal-view">
+                <div class="edit-goal-button" id="edit-goal-button" title="Update Savings">
+                    <i class="fas fa-edit"></i>
+                  </div>
+                  
                 <div class="goal-target">R 50 000</div>
                 
                 <div class="goal-container">
@@ -412,15 +481,34 @@
                         </div>
                     </div>
                     
-                    <div class="bottle-container">
+                    <!-- <div class="bottle-container">
                        
-                        <div class="goal-progress">
-                            <div class="progress-amount">R 3000</div>
-                            <div class="progress-arrow">→</div>
-                        </div>
+                        <div class="bottle-container">
+                            <div class="bottle-outer">
+                                <div class="bottle-water" id="bottle-water"></div>
+                                <img src="assets/bottle-outline.png" class="bottle-image" alt="Bottle">
+                            </div>
+                            <div class="progress-arrow">
+                                <div class="progress-amount" id="progress-amount">R </div>
 
-                        <div><img src="assets/bottle.jpg" alt="Savings Bottle" class="bottle-image"></div>
-                    </div>
+                            </div>
+                        </div>
+                        
+                    </div> -->
+
+                    <div class="bottle-container">
+                        <div class="goal-progress">
+                          <div class="progress-amount" id="progress-amount">R 0</div>
+                          <div class="progress-arrow">→</div>
+                        </div>
+                      
+                        <div class="bottle-wrapper">
+                          <img src="assets/water-bottle.png" alt="Savings Bottle" class="bottle-image">
+                          <div class="water-fill" id="water-fill"></div>
+                        </div>
+                      </div>
+                      
+
                 </div>
                 
                 <div class="goal-name">Car</div>
@@ -429,41 +517,13 @@
             <!-- Accounts View -->
             <div class="accounts-view" id="accounts-view">
                 <div class="accounts-list" id="accounts-list">
-                    <div class="account-card">
-                        <div class="account-info">
-                            <div class="account-icon">
-                                <i class="fas fa-university"></i>
-                            </div>
-                            <div class="account-name">Bank (FNB)</div>
-                        </div>
-                        <div class="account-balance">R 1000</div>
-                    </div>
-                    
-                    <div class="account-card">
-                        <div class="account-info">
-                            <div class="account-icon">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                            <div class="account-name">AltCoinTrader</div>
-                        </div>
-                        <div class="account-balance">R 4000</div>
-                    </div>
-                    
-                    <div class="account-card">
-                        <div class="account-info">
-                            <div class="account-icon">
-                                <i class="fab fa-paypal"></i>
-                            </div>
-                            <div class="account-name">Paypal</div>
-                        </div>
-                        <div class="account-balance">R 200</div>
-                    </div>
+                    <!-- Cards will be dynamically inserted here -->
                 </div>
-                
                 <div class="show-more">
                     <i class="fas fa-chevron-down"></i>
                 </div>
             </div>
+            
         </div>
         
     <div id="bottom-nav"></div>
@@ -543,295 +603,44 @@
         </div>
     </div>
 
-    <script>
-        // Sample accounts data
-        const accounts = [
-            { id: 1, name: 'Bank (FNB)', type: 'Bank', icon: 'university', balance: 1000 },
-            { id: 2, name: 'AltCoinTrader', type: 'Crypto', icon: 'dollar-sign', balance: 4000 },
-            { id: 3, name: 'Paypal', type: 'Other', icon: 'paypal', balance: 200 }
-        ];
+    <!-- Update saving goal progress -->
+    <div id="update-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Update Savings Amount</h2>
+          <form id="update-goal-form">
+            <label for="new-amount">Enter new amount saved:</label>
+            <input type="number" id="new-amount" required>
+            <div class="modal-buttons">
+              <button type="submit" class="save-button">Save</button>
+              <button type="button" class="cancel-button" id="cancel-update">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+    
+    <!-- Update acounts -->
+    <div id="add-to-account-modal" class="modal hidden">
+        <div class="modal-content">
+          <h2>Add to Account</h2>
+          <form id="add-to-account-form">
+            <input type="number" id="add-amount" placeholder="Enter amount to add" required>
+            <input type="hidden" id="account-id">
+            <div class="modal-actions">
+              <button type="submit">Add</button>
+              <button type="button" id="cancel-add">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      
+
+
+
+    <script type="module" src="balance-breakdown.js"></script>
+
         
-        // Sample saving goals data
-        const savingGoals = [
-            { id: 1, name: 'Car', target: 50000, current: 3000, date: '2025-12-31' },
-            { id: 2, name: 'Vacation', target: 15000, current: 5000, date: '2025-06-30' },
-            { id: 3, name: 'Emergency Fund', target: 30000, current: 10000, date: '2025-09-30' }
-        ];
-        
-        // Current view state and current goal index
-        let currentView = 'saving-goal';
-        let currentGoalIndex = 0;
-        
-        // Initialize the app
-        function init() {
-            renderAccounts();
-            updateSavingGoalView();
-            
-            // Tab switching
-            document.getElementById('saving-goal-tab').addEventListener('click', function() {
-                if (currentView !== 'saving-goal') {
-                    currentView = 'saving-goal';
-                    document.getElementById('accounts-tab').classList.remove('active');
-                    this.classList.add('active');
-                    document.getElementById('saving-goal-view').style.display = 'block';
-                    document.getElementById('accounts-view').style.display = 'none';
-                    updateSavingGoalView();
-                }
-            });
-            
-            document.getElementById('accounts-tab').addEventListener('click', function() {
-                if (currentView !== 'accounts') {
-                    currentView = 'accounts';
-                    document.getElementById('saving-goal-tab').classList.remove('active');
-                    this.classList.add('active');
-                    document.getElementById('saving-goal-view').style.display = 'none';
-                    document.getElementById('accounts-view').style.display = 'block';
-                }
-            });
-            
-            // Add button
-            document.getElementById('add-button').addEventListener('click', function() {
-                if (currentView === 'saving-goal') {
-                    document.getElementById('add-goal-modal').style.display = 'flex';
-                } else {
-                    document.getElementById('add-account-modal').style.display = 'flex';
-                }
-            });
-            
-            // Goal navigation
-            document.getElementById('prev-goal').addEventListener('click', function() {
-                if (currentGoalIndex > 0) {
-                    currentGoalIndex--;
-                } else {
-                    currentGoalIndex = savingGoals.length - 1;
-                }
-                updateSavingGoalView();
-            });
-            
-            document.getElementById('next-goal').addEventListener('click', function() {
-                if (currentGoalIndex < savingGoals.length - 1) {
-                    currentGoalIndex++;
-                } else {
-                    currentGoalIndex = 0;
-                }
-                updateSavingGoalView();
-            });
-            
-            // Account modal buttons
-            document.getElementById('cancel-add-account').addEventListener('click', function() {
-                document.getElementById('add-account-modal').style.display = 'none';
-                resetAccountModalForm();
-            });
-            
-            document.getElementById('confirm-add-account').addEventListener('click', function() {
-                const name = document.getElementById('account-name-input').value.trim();
-                const type = document.getElementById('account-type-input').value;
-                const balance = document.getElementById('account-balance-input').value;
-                
-                if (name && balance) {
-                    addAccount(name, type, parseFloat(balance));
-                    document.getElementById('add-account-modal').style.display = 'none';
-                    resetAccountModalForm();
-                } else {
-                    alert('Please fill in all required fields');
-                }
-            });
-            
-            // Goal modal buttons
-            document.getElementById('cancel-add-goal').addEventListener('click', function() {
-                document.getElementById('add-goal-modal').style.display = 'none';
-                resetGoalModalForm();
-            });
-            
-            document.getElementById('confirm-add-goal').addEventListener('click', function() {
-                const name = document.getElementById('goal-name-input').value.trim();
-                const target = document.getElementById('goal-target-input').value;
-                const current = document.getElementById('goal-current-input').value;
-                const date = document.getElementById('goal-date-input').value;
-                
-                if (name && target && current && date) {
-                    addSavingGoal(name, parseFloat(target), parseFloat(current), date);
-                    document.getElementById('add-goal-modal').style.display = 'none';
-                    resetGoalModalForm();
-                } else {
-                    alert('Please fill in all required fields');
-                }
-            });
-            
-            // Navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    if (!this.classList.contains('active')) {
-                        document.querySelector('.nav-item.active').classList.remove('active');
-                        this.classList.add('active');
-                        alert(`Navigate to ${this.querySelector('span').textContent}`);
-                    }
-                });
-            });
-            
-            // Back button
-            document.querySelector('.back-button').addEventListener('click', function() {
-                alert('Navigate back to dashboard');
-            });
-            
-            // Show more button
-            document.querySelector('.show-more').addEventListener('click', function() {
-                alert('Show more accounts');
-            });
-        }
-        
-        // Update saving goal view
-        function updateSavingGoalView() {
-            if (savingGoals.length === 0) {
-                document.getElementById('saving-goal-view').innerHTML = `
-                    <p style="text-align: center; color: #888; margin-top: 30px;">
-                        No saving goals yet. Click the Add button to create one.
-                    </p>
-                `;
-                return;
-            }
-            
-            const goal = savingGoals[currentGoalIndex];
-            const progressPercentage = (goal.current / goal.target) * 100;
-            const bottomPosition = Math.min(Math.max(progressPercentage, 5), 95); // Keep between 5% and 95% for visibility
-            
-            document.querySelector('.goal-target').textContent = `R ${goal.target.toLocaleString()}`;
-            document.querySelector('.goal-name').textContent = goal.name;
-            document.querySelector('.progress-amount').textContent = `R ${goal.current.toLocaleString()}`;
-            document.querySelector('.goal-progress').style.bottom = `${bottomPosition}%`;
-        }
-        
-        // Render accounts
-        function renderAccounts() {
-            const accountsList = document.getElementById('accounts-list');
-            accountsList.innerHTML = '';
-            
-            if (accounts.length === 0) {
-                accountsList.innerHTML = `
-                    <p style="text-align: center; color: #888; margin-top: 30px;">
-                        No accounts yet. Click the Add button to add one.
-                    </p>
-                `;
-                return;
-            }
-            
-            accounts.forEach(account => {
-                const accountCard = document.createElement('div');
-                accountCard.className = 'account-card';
-                
-                let iconClass = 'fas fa-university'; // Default icon
-                
-                // Set icon based on account type
-                switch(account.type) {
-                    case 'Bank':
-                        iconClass = 'fas fa-university';
-                        break;
-                    case 'Credit':
-                        iconClass = 'fas fa-credit-card';
-                        break;
-                    case 'Investment':
-                        iconClass = 'fas fa-chart-line';
-                        break;
-                    case 'Crypto':
-                        iconClass = 'fas fa-dollar-sign';
-                        break;
-                    case 'Cash':
-                        iconClass = 'fas fa-money-bill-wave';
-                        break;
-                    default:
-                        if (account.name.toLowerCase().includes('paypal')) {
-                            iconClass = 'fab fa-paypal';
-                        }
-                }
-                
-                accountCard.innerHTML = `
-                    <div class="account-info">
-                        <div class="account-icon">
-                            <i class="${iconClass}"></i>
-                        </div>
-                        <div class="account-name">${account.name}</div>
-                    </div>
-                    <div class="account-balance">R ${account.balance.toLocaleString()}</div>
-                `;
-                
-                accountsList.appendChild(accountCard);
-            });
-        }
-        
-        // Add new account
-        function addAccount(name, type, balance) {
-            const newId = accounts.length > 0 ? Math.max(...accounts.map(account => account.id)) + 1 : 1;
-            
-            let icon = 'university'; // Default icon
-            
-            // Set icon based on account type
-            switch(type) {
-                case 'Bank':
-                    icon = 'university';
-                    break;
-                case 'Credit':
-                    icon = 'credit-card';
-                    break;
-                case 'Investment':
-                    icon = 'chart-line';
-                    break;
-                case 'Crypto':
-                    icon = 'dollar-sign';
-                    break;
-                case 'Cash':
-                    icon = 'money-bill-wave';
-                    break;
-                default:
-                    if (name.toLowerCase().includes('paypal')) {
-                        icon = 'paypal';
-                    }
-            }
-            
-            accounts.push({
-                id: newId,
-                name,
-                type,
-                icon,
-                balance
-            });
-            
-            renderAccounts();
-        }
-        
-        // Add new saving goal
-        function addSavingGoal(name, target, current, date) {
-            const newId = savingGoals.length > 0 ? Math.max(...savingGoals.map(goal => goal.id)) + 1 : 1;
-            
-            savingGoals.push({
-                id: newId,
-                name,
-                target,
-                current,
-                date
-            });
-            
-            currentGoalIndex = savingGoals.length - 1;
-            updateSavingGoalView();
-        }
-        
-        // Reset account modal form
-        function resetAccountModalForm() {
-            document.getElementById('account-name-input').value = '';
-            document.getElementById('account-type-input').value = 'Bank';
-            document.getElementById('account-balance-input').value = '';
-        }
-        
-        // Reset goal modal form
-        function resetGoalModalForm() {
-            document.getElementById('goal-name-input').value = '';
-            document.getElementById('goal-target-input').value = '';
-            document.getElementById('goal-current-input').value = '';
-            document.getElementById('goal-date-input').value = '';
-        }
-        
-        // Initialize when the page loads
-        window.addEventListener('load', init);
-    </script>
 </body>
 
 

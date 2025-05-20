@@ -198,6 +198,97 @@
       text-decoration: none;
       color: inherit;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: auto;
+        padding: 20px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 350px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .modal-button {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .cancel-button {
+        background-color: #f5f5f5;
+        color: #666;
+    }
+
+    .add-item-button {
+        background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+        color: white;
+        width: 60%;
+    }
+
+
+    .form-group {
+            margin-bottom: 20px;
+        }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+        background-color: white;
+    } 
+
+    .text-green {
+    color: green;
+    }
+    .text-red {
+        color: red;
+    }
   </style>
 </head>
 <body>
@@ -231,12 +322,12 @@
       <h1 id="total-balance">R 12,800</h1>
       
       <div class="income-expense">
-        <a href="add-income.html">
-          <div class="income">
+        <!-- <a href="add-income.html"> -->
+          <div class="income" id="open-income-modal" style="cursor: pointer;">
             <div class="label">Income</div>
             <div class="amount" id="income">{{income}}</div>
           </div>
-        </a>
+          
 
         <div class="expense">
           <div class="label">Expenses</div>
@@ -270,6 +361,38 @@
     </div>
   </div>
 
+  <!-- Add Income Modal -->
+  <div id="add-income-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-title">Add Income</div>
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" id="income-name-input" class="form-input"  placeholder="Enter income source">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount</label>
+        <input type="number" id="income-amount-input" class="form-input" placeholder="Enter amount">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" id="income-date-input" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Account</label>
+        <select id="income-account-select" class="form-input"></select>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="recurring-income-checkbox" class="form-input">
+        <label class="form-label" for="recurring-income-checkbox">Recurring Monthly</label>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-button cancel-button" id="cancel-income">Cancel</button>
+        <button class="modal-button add-item-button" id="confirm-income">Add</button>
+      </div>
+    </div>
+  </div>
+  
+
   <div id="bottom-nav"></div>
   <script>
     fetch('bottom-nav.html')
@@ -279,85 +402,318 @@
       });
   </script>
 
+
 <script type="module">
   import { db } from './database.js';
 
-  // Fetch logged-in user email
-  const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
-  console.log('Logged-in user email:', loggedInUserEmail);
+  document.addEventListener('DOMContentLoaded', async () => {
+    const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
 
-  if (!loggedInUserEmail) {
-    alert('No user is logged in. Redirecting to login page.');
-    window.location.href = 'login.html';
-  } else {
-    // Get user data from IndexedDB
-    db.users.get({ email: loggedInUserEmail }).then(async user => {
-      if (!user) {
-        alert('User not found. Redirecting to login.');
-        window.location.href = 'login.html';
-        return;
-      }
+    if (!loggedInUserEmail) {
+      alert('No user is logged in. Redirecting to login page.');
+      window.location.href = 'login.html';
+      return;
+    }
 
-      console.log('User found:', user);
+    const user = await db.users.get({ email: loggedInUserEmail });
+    if (!user) {
+      alert('User not found. Redirecting to login.');
+      window.location.href = 'login.html';
+      return;
+    }
 
-      // Update greeting
-      document.querySelector('.greeting').textContent = `Hello, ${user.name}`;
+    document.querySelector('.greeting').textContent = `Hello, ${user.name}`;
 
-      // Get all user's finances
-      const userFinances = await db.finances.where('userId').equals(user.id).toArray();
+    const userIncome = typeof user.income === 'number' ? user.income : 0;
 
-      // Calculate total expenses from finances
-      const totalExpenses = userFinances.reduce((sum, entry) => sum + Number(entry.amount), 0);
+    const [userFinances, userSavings, userAccounts, userTransactions] = await Promise.all([
+      db.finances.where('userId').equals(user.id).toArray(),
+      db.savings.where('userId').equals(user.id).toArray(),
+      db.accounts.where('userId').equals(user.id).toArray(),
+      db.transactions.where('userId').equals(user.id).toArray()
+    ]);
 
-      // Update totals
-      document.getElementById('total-balance').textContent = `R ${user.income - totalExpenses}`;
-      document.getElementById('income').textContent = `R ${user.income}`;
-      document.getElementById('expenses').textContent = `R ${totalExpenses}`;
+    const totalExpenses = userFinances.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    const totalSavings = userSavings.reduce((sum, s) => sum + (Number(s.current) || 0), 0);
+    const totalAccounts = userAccounts.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+    const totalBalance = userIncome + totalSavings + totalAccounts - totalExpenses;
 
-      // Load transaction history
-      const transactionList = document.querySelector('.transactions');
-      transactionList.innerHTML = ''; // Clear existing content
+    document.getElementById('total-balance').textContent = `R ${totalBalance.toLocaleString()}`;
+    document.getElementById('income').textContent = `R ${userIncome.toLocaleString()}`;
+    document.getElementById('expenses').textContent = `R ${totalExpenses.toLocaleString()}`;
 
-      // Insert the header back
-      const headerHTML = `
-        <div class="transaction-header-text">
-          <h3>Transactions History</h3>
-          <h2>See all</h2>  
-        </div>
-      `;
-      transactionList.innerHTML = headerHTML;
+    // 🔁 COMBINED TRANSACTION HISTORY: EXPENSES (from finances) + DEPOSITS (from transactions)
+    const combinedTransactions = [
+      ...userFinances.map(f => ({
+        type: 'expense',
+        name: f.category || 'Unknown',
+        amount: -Math.abs(f.amount),
+        date: f.date
+      })),
+      ...userTransactions.map(t => ({
+        type: 'deposit',
+        name: t.name || 'Deposit',
+        amount: Math.abs(t.amount),
+        date: t.date
+      }))
+    ];
 
-      if (userFinances.length === 0) {
-        transactionList.innerHTML += '<p>No transactions available.</p>';
-        return;
-      }
+    const recentTransactions = combinedTransactions
+      .filter(t => t.date)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 5);
 
-      // Show 5 most recent transactions
-      const recentTransactions = userFinances
-        .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
-        .slice(0, 5);
+    const transactionList = document.querySelector('.transactions');
+    transactionList.innerHTML = `
+      <div class="transaction-header-text">
+        <h3>Transactions History</h3>
+        <h2>See all</h2>  
+      </div>
+    `;
 
+    if (recentTransactions.length === 0) {
+      transactionList.innerHTML += '<p>No transactions available.</p>';
+    } else {
       recentTransactions.forEach(transaction => {
         const transactionItem = document.createElement('div');
         transactionItem.className = 'transaction-item';
         transactionItem.innerHTML = `
           <div class="transaction-details">
-            <div class="transaction-name">${transaction.category}</div>
-            <div class="transaction-date">${new Date(transaction.timestamp || Date.now()).toLocaleDateString()}</div>
+            <div class="transaction-name">${transaction.name}</div>
+            <div class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</div>
           </div>
-          <div class="transaction-amount" style="color: ${transaction.classification === 'Essential' || 'Nice to have' ? 'red' : '#3c6255'};">
-            - R ${transaction.amount}
+          <div class="transaction-amount" style="color: ${transaction.amount < 0 ? 'red' : 'green'};">
+            ${transaction.amount < 0 ? '-' : '+'} R ${Math.abs(transaction.amount).toLocaleString()}
           </div>
         `;
         transactionList.appendChild(transactionItem);
       });
+    }
 
-    }).catch(error => {
-      console.error('Error fetching user data:', error);
-      alert('An error occurred. Please try again.');
+    // MODAL SETUP
+    const incomeModal = document.getElementById('add-income-modal');
+    const openIncomeBtn = document.getElementById('open-income-modal');
+    const cancelIncomeBtn = document.getElementById('cancel-income');
+    const confirmIncomeBtn = document.getElementById('confirm-income');
+    const accountSelect = document.getElementById('income-account-select');
+
+    openIncomeBtn.addEventListener('click', async () => {
+      const user = await db.users.get({ email: loggedInUserEmail });
+      const accounts = await db.accounts.where('userId').equals(user.id).toArray();
+
+      if (accounts.length === 0) {
+        alert('Please add an account before adding income.');
+        return;
+      }
+
+      incomeModal.style.display = 'flex';
+
+      accountSelect.innerHTML = accounts.map(acc =>
+        `<option value="${acc.id}">${acc.name} (R ${acc.amount})</option>`
+      ).join('');
     });
-  }
+
+    cancelIncomeBtn.addEventListener('click', () => {
+      incomeModal.style.display = 'none';
+    });
+
+    confirmIncomeBtn.addEventListener('click', async () => {
+      const name = document.getElementById('income-name-input').value;
+      const amount = parseFloat(document.getElementById('income-amount-input').value);
+      const date = document.getElementById('income-date-input').value;
+      const accountId = Number(accountSelect.value);
+      const isRecurring = document.getElementById('recurring-income-checkbox').checked;
+
+      if (!name || isNaN(amount) || !date || isNaN(accountId)) {
+        alert('Please complete all fields.');
+        return;
+      }
+
+      await db.income.add({
+        userId: user.id,
+        name,
+        amount,
+        date: new Date(date),
+        accountId,
+        isRecurring
+      });
+
+      user.income = (user.income || 0) + amount;
+      await db.users.put(user);
+
+      const account = await db.accounts.get(accountId);
+      if (account) {
+        account.amount += amount;
+        await db.accounts.put(account);
+      }
+
+      // ✅ ADD TRANSACTION RECORD FOR DEPOSIT
+      await db.transactions.add({
+        userId: user.id,
+        type: 'deposit',
+        name,
+        amount,
+        date: new Date(date),
+        sourceId: accountId
+      });
+
+      incomeModal.style.display = 'none';
+      location.reload();
+    });
+  });
 </script>
+
+
+
+
+<!-- <script type="module">
+  import { db } from './database.js';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+
+    if (!loggedInUserEmail) {
+      alert('No user is logged in. Redirecting to login page.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const user = await db.users.get({ email: loggedInUserEmail });
+    if (!user) {
+      alert('User not found. Redirecting to login.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Show greeting
+    document.querySelector('.greeting').textContent = `Hello, ${user.name}`;
+
+    // Total income
+    const userIncome = typeof user.income === 'number' ? user.income : 0;
+
+    // Load all user data
+    const [userFinances, userSavings, userAccounts] = await Promise.all([
+      db.finances.where('userId').equals(user.id).toArray(),
+      db.savings.where('userId').equals(user.id).toArray(),
+      db.accounts.where('userId').equals(user.id).toArray()
+    ]);
+
+    const totalExpenses = userFinances.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    const totalSavings = userSavings.reduce((sum, s) => sum + (Number(s.current) || 0), 0);
+    const totalAccounts = userAccounts.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+
+    const totalBalance = ( userIncome || 0) + (totalSavings || 0) + (totalAccounts || 0) - (totalExpenses || 0);
+
+    document.getElementById('total-balance').textContent = `R ${totalBalance.toLocaleString()}`;
+    document.getElementById('income').textContent = `R ${userIncome.toLocaleString()}`;
+    document.getElementById('expenses').textContent = `R ${totalExpenses.toLocaleString()}`;
+
+    // Transaction History
+    const transactionList = document.querySelector('.transactions');
+    transactionList.innerHTML = `
+      <div class="transaction-header-text">
+        <h3>Transactions History</h3>
+        <h2>See all</h2>  
+      </div>
+    `;
+
+    const recentTransactions = userFinances
+      .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
+      .slice(0, 5);
+
+    if (recentTransactions.length === 0) {
+      transactionList.innerHTML += '<p>No transactions available.</p>';
+    } else {
+      recentTransactions.forEach(transaction => {
+        const transactionItem = document.createElement('div');
+        transactionItem.className = 'transaction-item';
+        transactionItem.innerHTML = `
+          <div class="transaction-details">
+            <div class="transaction-name">${transaction.category || 'Unknown'}</div>
+            <div class="transaction-date">${new Date(transaction.timestamp || Date.now()).toLocaleDateString()}</div>
+          </div>
+          <div class="transaction-amount" style="color: ${transaction.classification === 'Essential' || transaction.classification === 'Nice to have' ? 'red' : '#3c6255'};">
+            - R ${Number(transaction.amount || 0).toLocaleString()}
+          </div>
+        `;
+        transactionList.appendChild(transactionItem);
+      });
+    }
+
+    // Modal setup
+    const incomeModal = document.getElementById('add-income-modal');
+    const openIncomeBtn = document.getElementById('open-income-modal');
+    const cancelIncomeBtn = document.getElementById('cancel-income');
+    const confirmIncomeBtn = document.getElementById('confirm-income');
+    const accountSelect = document.getElementById('income-account-select');
+
+    openIncomeBtn.addEventListener('click', async () => {
+    // Get current user
+    const user = await db.users.get({ email: loggedInUserEmail });
+
+    // Fetch user's accounts
+    const accounts = await db.accounts.where('userId').equals(user.id).toArray();
+
+    // If no accounts exist, prompt user to create one
+    if (accounts.length === 0) {
+      alert('Please add an account before adding income.');
+      return;
+    }
+
+    // Show modal
+    incomeModal.style.display = 'flex';
+
+    // Populate account dropdown
+    const accountSelect = document.getElementById('income-account-select');
+    accountSelect.innerHTML = accounts.map(acc =>
+      `<option value="${acc.id}">${acc.name} (R ${acc.amount})</option>`
+    ).join('');
+  });
+
+
+    cancelIncomeBtn.addEventListener('click', () => {
+      incomeModal.style.display = 'none';
+    });
+
+    confirmIncomeBtn.addEventListener('click', async () => {
+      const name = document.getElementById('income-name-input').value;
+      const amount = parseFloat(document.getElementById('income-amount-input').value);
+      const date = document.getElementById('income-date-input').value;
+      const accountId = Number(accountSelect.value);
+      const isRecurring = document.getElementById('recurring-income-checkbox').checked;
+
+      if (!name || isNaN(amount) || !date || isNaN(accountId)) {
+        alert('Please complete all fields.');
+        return;
+      }
+
+      await db.income.add({
+        userId: user.id,
+        name,
+        amount,
+        date: new Date(date),
+        accountId,
+        repeat: isRecurring
+      });
+
+      // Update user income
+      user.income = (user.income || 0) + amount;
+      await db.users.put(user);
+
+      // Update account balance
+      const account = await db.accounts.get(accountId);
+      if (account) {
+        account.amount += amount;
+        await db.accounts.put(account);
+      }
+
+      incomeModal.style.display = 'none';
+      location.reload();
+    });
+  });
+</script> -->
+
+
 
   
 </body>
