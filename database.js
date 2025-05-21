@@ -1,4 +1,4 @@
-import Dexie from './node_modules/dexie/dist/dexie.mjs';
+import Dexie from './assets/node_modules/dexie/dist/dexie.mjs';
 
 export const db = new Dexie("MyBuddyAppDB");
 
