@@ -48,23 +48,28 @@
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
-/
-├── assets/ # Images and icons
-├── styles/ # CSS stylesheets
-├── database.js # Dexie.js database setup
-├── login.html # User login page
-├── register.html # User registration page
-├── index.html # Homepage (dashboard)
-├── accounts.html # Accounts and goals
-├── add-account.html # Add account or savings goal
-├── stats.html # Statistics & charts
-├── profile.html # User profile page
-├── bottom-nav.html # Reusable bottom nav component
-└── README.md # Project documentation
+```plaintext
+mybuddyapp/
+├── assets/                    # Images, icons, and static media
+│   ├── profile.png
+│   └── ...
+├── styles/                    # CSS stylesheets
+│   └── style.css
+├── database.js                # Dexie.js IndexedDB setup and schema
+├── index.html                 # Home dashboard (total balance, income, expenses, transactions)
+├── login.html                 # User login page
+├── register.html              # User registration page
+├── accounts.html              # View and manage user accounts and savings
+├── add-account.html           # Modal to add accounts or savings goals
+├── stats.html                 # Statistics page with charts, filters (day/week/month/year)
+├── profile.html               # User profile page (displays name, email, and settings)
+├── bottom-nav.html            # Reusable bottom navigation bar component
+├── manifest.json              # (Optional) Web app manifest for PWA support
+├── service-worker.js          # (Optional) Service worker for offline support and caching
+└── README.md                  # Project documentation
 
----
 
 ## 📦 Dexie.js Schema
 
