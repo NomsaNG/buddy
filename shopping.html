@@ -345,7 +345,7 @@
         <div class="content">
             <div class="balance-section">
                 <div class="balance-label">Total Balance</div>
-                <div class="balance-amount">R 2,548.00</div>
+                <div class="balance-amount" id="total-balance">R0.00</div>
                 
                 <div class="add-button" id="add-shopping-btn">
                     <i class="fas fa-plus"></i>
@@ -414,31 +414,34 @@
         </div>
     </div>
 
-    <script>
-        // Sample shopping items
-        const shoppingItems = [
-            { id: 1, name: 'Cheese', category: 'Groceries', priority: 'High', price: 59.99, purchased: true },
-            { id: 2, name: 'Juice', category: 'Groceries', priority: 'Low', price: 19.99, purchased: false },
-            { id: 3, name: 'Yogurt', category: 'Groceries', priority: 'High', price: 19.99, purchased: false },
-            { id: 4, name: 'Toothpaste', category: 'Groceries', priority: 'High', price: 19.99, purchased: false }
-        ];
-        
-        // Current view state
-        let currentView = 'to-buy';
-        
-        // Render shopping list based on current view
-        function renderShoppingList() {
+    <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.min.js"></script>
+
+    <script type="module">
+        import { db } from './database.js';
+        let currentUser = null;
+    
+        // Fetch the current logged-in user
+        async function getCurrentUser() {
+            return await db.users.toCollection().last();
+        }
+    
+        // Get user's shopping items from Dexie
+        async function getUserShoppingItems() {
+            if (!currentUser) return [];
+            return await db.shopping.where('userId').equals(currentUser.id).toArray();
+        }
+    
+        // Render shopping list based on current view and logged-in user
+        async function renderShoppingList() {
             const shoppingListElement = document.getElementById('shopping-list');
             shoppingListElement.innerHTML = '';
-            
-            const filteredItems = shoppingItems.filter(item => {
-                if (currentView === 'to-buy') {
-                    return !item.purchased;
-                } else {
-                    return item.purchased;
-                }
-            });
-            
+    
+            const shoppingItems = await getUserShoppingItems();
+    
+            const filteredItems = shoppingItems.filter(item =>
+                currentView === 'to-buy' ? !item.purchased : item.purchased
+            );
+    
             if (filteredItems.length === 0) {
                 shoppingListElement.innerHTML = `
                     <p style="text-align: center; color: #888; margin-top: 30px;">
@@ -447,12 +450,12 @@
                 `;
                 return;
             }
-            
+    
             filteredItems.forEach(item => {
                 const itemElement = document.createElement('div');
                 itemElement.className = 'shopping-item';
                 itemElement.dataset.id = item.id;
-                
+    
                 itemElement.innerHTML = `
                     <div class="item-left">
                         <div class="checkbox ${item.purchased ? 'checked' : ''}" data-id="${item.id}">
@@ -472,65 +475,76 @@
                         </div>
                     </div>
                 `;
-                
+    
                 shoppingListElement.appendChild(itemElement);
             });
-            
-            // Add event listeners to checkboxes and delete buttons
-            document.querySelectorAll('.checkbox').forEach(checkbox => {
-                checkbox.addEventListener('click', toggleItemPurchased);
-            });
-            
-            document.querySelectorAll('.delete-button').forEach(button => {
-                button.addEventListener('click', deleteItem);
-            });
+    
+            // Add event listeners
+            document.querySelectorAll('.checkbox').forEach(cb =>
+                cb.addEventListener('click', toggleItemPurchased));
+            document.querySelectorAll('.delete-button').forEach(btn =>
+                btn.addEventListener('click', deleteItem));
         }
-        
-        // Toggle item purchased state
-        function toggleItemPurchased() {
+    
+        // Toggle item purchased
+        async function toggleItemPurchased() {
             const itemId = parseInt(this.dataset.id);
-            const item = shoppingItems.find(item => item.id === itemId);
-            
-            if (item) {
-                item.purchased = !item.purchased;
+            const item = await db.shopping.get(itemId);
+            if (item && item.userId === currentUser.id) {
+                await db.shopping.update(itemId, { purchased: !item.purchased });
                 renderShoppingList();
             }
         }
-        
+    
         // Delete item
-        function deleteItem() {
+        async function deleteItem() {
             const itemId = parseInt(this.dataset.id);
-            const itemIndex = shoppingItems.findIndex(item => item.id === itemId);
-            
-            if (itemIndex !== -1) {
-                shoppingItems.splice(itemIndex, 1);
+            const item = await db.shopping.get(itemId);
+            if (item && item.userId === currentUser.id) {
+                await db.shopping.delete(itemId);
                 renderShoppingList();
             }
         }
-        
+    
         // Add new item
-        function addItem(name, category, priority, price) {
-            const newId = shoppingItems.length > 0 ? Math.max(...shoppingItems.map(item => item.id)) + 1 : 1;
-            
-            shoppingItems.push({
-                id: newId,
+        async function addItem(name, category, priority, price) {
+            if (!currentUser) return;
+            await db.shopping.add({
                 name,
                 category,
                 priority,
                 price: parseFloat(price),
-                purchased: false
+                purchased: false,
+                userId: currentUser.id
             });
-            
             renderShoppingList();
         }
-        
-        // Initialize the app
-        function init() {
-            // Render initial shopping list
-            renderShoppingList();
-            
-            // Tab switching
-            document.getElementById('to-buy-tab').addEventListener('click', function() {
+    
+        // Calculate and update total balance
+        async function updateTotalBalance() {
+            if (!currentUser) return;
+            const accounts = await db.accounts.where('userId').equals(currentUser.id).toArray();
+            const total = accounts.reduce((sum, acc) => sum + (parseFloat(acc.amount) || 0), 0);
+            document.getElementById('total-balance').textContent = `R ${total.toFixed(2)}`;
+        }
+    
+        // Reset modal form
+        function resetModalForm() {
+            document.getElementById('item-name-input').value = '';
+            document.getElementById('item-category-input').value = 'Groceries';
+            document.getElementById('item-priority-input').value = 'High';
+            document.getElementById('item-price-input').value = '';
+        }
+    
+        // Init the page
+        async function init() {
+            currentUser = await getCurrentUser();
+            if (!currentUser) return;
+    
+            await renderShoppingList();
+            await updateTotalBalance();
+    
+            document.getElementById('to-buy-tab').addEventListener('click', function () {
                 if (currentView !== 'to-buy') {
                     currentView = 'to-buy';
                     document.getElementById('purchased-tab').classList.remove('active');
@@ -538,8 +552,8 @@
                     renderShoppingList();
                 }
             });
-            
-            document.getElementById('purchased-tab').addEventListener('click', function() {
+    
+            document.getElementById('purchased-tab').addEventListener('click', function () {
                 if (currentView !== 'purchased') {
                     currentView = 'purchased';
                     document.getElementById('to-buy-tab').classList.remove('active');
@@ -547,25 +561,22 @@
                     renderShoppingList();
                 }
             });
-            
-            // Add item button
-            document.getElementById('add-shopping-btn').addEventListener('click', function() {
+    
+            document.getElementById('add-shopping-btn').addEventListener('click', function () {
                 document.getElementById('add-item-modal').style.display = 'flex';
             });
-            
-            // Modal cancel button
-            document.getElementById('cancel-add-item').addEventListener('click', function() {
+    
+            document.getElementById('cancel-add-item').addEventListener('click', function () {
                 document.getElementById('add-item-modal').style.display = 'none';
                 resetModalForm();
             });
-            
-            // Modal add item button
-            document.getElementById('confirm-add-item').addEventListener('click', function() {
+    
+            document.getElementById('confirm-add-item').addEventListener('click', function () {
                 const name = document.getElementById('item-name-input').value.trim();
                 const category = document.getElementById('item-category-input').value;
                 const priority = document.getElementById('item-priority-input').value;
                 const price = document.getElementById('item-price-input').value;
-                
+    
                 if (name && price) {
                     addItem(name, category, priority, price);
                     document.getElementById('add-item-modal').style.display = 'none';
@@ -574,10 +585,9 @@
                     alert('Please fill in all required fields');
                 }
             });
-            
-            // Navigation
+    
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function () {
                     if (!this.classList.contains('active')) {
                         document.querySelector('.nav-item.active').classList.remove('active');
                         this.classList.add('active');
@@ -585,23 +595,11 @@
                     }
                 });
             });
-            
-            // // Back button
-            // document.querySelector('.back-button').addEventListener('click', function() {
-            //     alert('Navigate back to dashboard');
-            // });
         }
-        
-        // Reset modal form
-        function resetModalForm() {
-            document.getElementById('item-name-input').value = '';
-            document.getElementById('item-category-input').value = 'Groceries';
-            document.getElementById('item-priority-input').value = 'High';
-            document.getElementById('item-price-input').value = '';
-        }
-        
-        // Initialize when the page loads
+    
+        let currentView = 'to-buy';
         window.addEventListener('load', init);
     </script>
+    
 </body>
 </html>

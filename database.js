@@ -8,7 +8,8 @@ db.version(1).stores({
   savings: '++id, userId, name, target, current, date',
   accounts: '++id, userId, name, amount',
   income: '++id, userId, name, amount, date, accountId, isRecurring',
-  transactions: '++id, userId, type, name, amount, date, sourceId'
+  transactions: '++id, userId, type, name, amount, date, sourceId',
+  shopping: '++id, userId, name, category, priority, price, purchased'  
 });
 
 export default db;

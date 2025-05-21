@@ -304,7 +304,8 @@
         <div class="content">
             <div class="balance-section">
                 <div class="balance-label">Total Balance</div>
-                <div class="balance-amount">R2,548.00</div>
+                <div class="balance-amount" id="total-balance">R0.00</div>
+
                 
                 <div class="add-button" id="open-add-expense-modal">
                     <i class="fas fa-plus"></i>
@@ -322,56 +323,24 @@
             <div class="expense-list">
                 <div class="expense-item"> </div>
                     
-                    <!-- <div class="expense-name">Tithe</div>
-                    <div class="expense-amount">R1 300</div>
-                </div>
-                <div class="expense-item">
-                    <div class="expense-name">Rent</div>
-                    <div class="expense-amount">R2 500</div>
-                </div>
-                <div class="expense-item">
-                    <div class="expense-name">Groceries</div>
-                    <div class="expense-amount">R1 300</div>
-                </div>
-                <div class="expense-item">
-                    <div class="expense-name">Toiletries</div>
-                    <div class="expense-amount">R1 300</div>
-                </div>
-                <div class="expense-item">
-                    <div class="expense-name">Transport</div>
-                    <div class="expense-amount">R1 300</div>
-                </div> -->
             </div>
 
             <div class="nice-to-have">
                 <div class="expense-item">
-                    <!-- <div class="expense-name">Dining Out</div>
-                    <div class="expense-amount">R1 300</div> -->
-                </div>
-                <!-- <div class="expense-item">
-                    <div class="expense-name">Dining Out</div>
-                    <div class="expense-amount">R1 300</div>
-                </div>
-                <div class="expense-item">
-                    <div class="expense-name">Entertainment</div>
-                    <div class="expense-amount">R1 300</div>
-                </div>
-                <div class="expense-item">
-                    <div class="expense-name">Shopping</div>
-                    <div class="expense-amount">R1 300</div>
-                </div> -->
+
             </div>
         </div>
         
-        <div id="bottom-nav"></div>
-        <script>
-            fetch('bottom-nav.html')
-              .then(res => res.text())
-              .then(html => {
-                document.getElementById('bottom-nav').innerHTML = html;
-              });
-          </script>
+
     </div>
+    <div id="bottom-nav"></div>
+    <script>
+        fetch('bottom-nav.html')
+          .then(res => res.text())
+          .then(html => {
+            document.getElementById('bottom-nav').innerHTML = html;
+          });
+      </script>
 
     <!-- Add Expense Modal -->
     <div class="modal" id="add-expense-modal" style="display: none;">
@@ -422,113 +391,163 @@
     <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.min.js"></script>
     <script type="module">
         import { db } from './database.js';
-        
-        const userId = parseInt(localStorage.getItem('loggedInUserId'), 10);
-
-        if (!userId) {
-        alert("User not logged in. Redirecting...");
-        window.location.href = "login.html"; 
-    }
-        // Step 2: Function to render expenses
+    
+        let userId;
+        let updateTotalBalance;
+    
+        // Render user expenses
         async function renderExpenses() {
             const essentialList = document.querySelector('.expense-list');
             const niceList = document.querySelector('.nice-to-have');
     
-            // // Clear existing items
-            // essentialList.innerHTML = '';
-            // niceList.innerHTML = '';
+            // Clear old entries
+            essentialList.innerHTML = '';
+            niceList.innerHTML = '';
     
-            // Fetch all expenses
             try {
-            // Only fetch expenses for the logged-in user
-            const expenses = await db.finances.where('userId').equals(userId).toArray();
-
-            if (expenses.length === 0) {
-                essentialList.innerHTML = '<p>No expenses found.</p>';
+                const expenses = await db.finances.where('userId').equals(userId).toArray();
+    
+                if (expenses.length === 0) {
+                    essentialList.innerHTML = '<p>No expenses found.</p>';
+                    return;
+                }
+    
+                expenses.forEach(exp => {
+                    const item = document.createElement('div');
+                    item.classList.add('expense-item');
+                    item.innerHTML = `
+                        <div class="expense-name">${exp.category}</div>
+                        <div class="expense-amount">R${exp.amount}</div>
+                    `;
+    
+                    if (exp.classification === 'Essential') {
+                        essentialList.appendChild(item);
+                    } else if (exp.classification === 'Nice to have') {
+                        niceList.appendChild(item);
+                    }
+                });
+            } catch (err) {
+                console.error("Failed to load expenses:", err);
+                alert("Error loading expenses.");
+            }
+        }
+    
+        // Main IIFE
+        (async () => {
+            userId = parseInt(localStorage.getItem('loggedInUserId'), 10);
+            const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+    
+            if (!userId || !loggedInUserEmail) {
+                alert("User not logged in. Redirecting...");
+                window.location.href = "login.html"; 
                 return;
             }
-
-            expenses.forEach(exp => {
-                const item = document.createElement('div');
-                item.classList.add('expense-item');
-                item.innerHTML = `
-                    <div class="expense-name">${exp.category}</div>
-                    <div class="expense-amount">R${exp.amount}</div>
-                `;
-
-                // If classification is 'Essential', append to the essential list
-                if (exp.classification === 'Essential') {
-                    essentialList.appendChild(item);
-                } 
-                // Otherwise, it should be 'Nice to have'
-                else if (exp.classification === 'Nice to have') {
-                    niceList.appendChild(item);
+    
+            try {
+                const user = await db.users.get({ email: loggedInUserEmail });
+    
+                if (!user) {
+                    alert("User not found. Redirecting...");
+                    window.location.href = "login.html";
+                    return;
+                }
+    
+                // Define this globally so it's accessible outside
+                updateTotalBalance = async function () {
+                    try {
+                        const userIncome = typeof user.income === 'number' ? user.income : 0;
+    
+                        const [userFinances, userSavings, userAccounts, userTransactions] = await Promise.all([
+                            db.finances.where('userId').equals(user.id).toArray(),
+                            db.savings.where('userId').equals(user.id).toArray(),
+                            db.accounts.where('userId').equals(user.id).toArray(),
+                            db.transactions.where('userId').equals(user.id).toArray()
+                        ]);
+    
+                        const totalExpenses = userFinances.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+                        const totalSavings = userSavings.reduce((sum, s) => sum + (Number(s.current) || 0), 0);
+                        const totalAccounts = userAccounts.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+                        const totalBalance = userIncome + totalSavings + totalAccounts - totalExpenses;
+    
+                        document.getElementById('total-balance').textContent = `R${totalBalance.toFixed(2)}`;
+                    } catch (err) {
+                        console.error("Failed to calculate balance:", err);
+                        document.getElementById('total-balance').textContent = "Error";
+                    }
+                };
+    
+                updateTotalBalance(); // Initial call
+    
+            } catch (err) {
+                console.error("Error loading user:", err);
+                alert("Something went wrong loading your account.");
+            }
+        })();
+    
+        // Toggle essential / nice-to-have
+        document.querySelectorAll('.toggle-option').forEach(option => {
+            option.addEventListener('click', function () {
+                document.querySelector('.toggle-option.active')?.classList.remove('active');
+                this.classList.add('active');
+    
+                if (this.textContent.trim() === 'Essential') {
+                    document.querySelector('.expense-list').style.display = 'block';
+                    document.querySelector('.nice-to-have').style.display = 'none';
+                } else {
+                    document.querySelector('.expense-list').style.display = 'none';
+                    document.querySelector('.nice-to-have').style.display = 'block';
                 }
             });
-        } catch (err) {
-            console.error("Failed to load expenses:", err);
-            alert("Error loading expenses.");
-        }
-    }
-
-    // Step 3: Toggle between categories
-    document.querySelectorAll('.toggle-option').forEach(option => {
-        option.addEventListener('click', function () {
-            document.querySelector('.toggle-option.active')?.classList.remove('active');
-            this.classList.add('active');
-
-            if (this.textContent.trim() === 'Essential') {
-                document.querySelector('.expense-list').style.display = 'block';
-                document.querySelector('.nice-to-have').style.display = 'none';
-            } else {
-                document.querySelector('.expense-list').style.display = 'none';
-                document.querySelector('.nice-to-have').style.display = 'block';
+        });
+    
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderExpenses();
+            // Safe to call now because it's globally declared
+            if (typeof updateTotalBalance === 'function') {
+                updateTotalBalance();
+            }
+            document.querySelector('.expense-list').style.display = 'block';
+            document.querySelector('.nice-to-have').style.display = 'none';
+        });
+    
+        // Open modal
+        document.getElementById('open-add-expense-modal').addEventListener('click', () => {
+            document.getElementById('add-expense-modal').style.display = 'flex';
+            document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
+        });
+    
+        // Cancel modal
+        document.getElementById('cancel-expense').addEventListener('click', () => {
+            document.getElementById('add-expense-modal').style.display = 'none';
+        });
+    
+        // Confirm add expense
+        document.getElementById('confirm-expense').addEventListener('click', async () => {
+            const category = document.getElementById('expense-category').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            const classification = document.getElementById('expense-classification').value;
+            const date = document.getElementById('expense-date').value;
+    
+            if (!amount || isNaN(amount)) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+    
+            try {
+                await db.finances.add({ userId, category, amount, classification, date });
+                alert("Expense added!");
+                document.getElementById('add-expense-modal').style.display = 'none';
+                renderExpenses();
+                updateTotalBalance();  // Recalculate after adding
+            } catch (err) {
+                console.error(err);
+                alert("Error saving expense.");
             }
         });
-    });
-
-    // Step 4: Initialize view
-    document.addEventListener('DOMContentLoaded', () => {
-        renderExpenses();
-        document.querySelector('.expense-list').style.display = 'block';
-        document.querySelector('.nice-to-have').style.display = 'none';
-    });
-
-    // Open modal
-    document.getElementById('open-add-expense-modal').addEventListener('click', () => {
-        document.getElementById('add-expense-modal').style.display = 'flex';
-        document.getElementById('expense-date').value = new Date().toISOString().split('T')[0];
-    });
-
-    // Cancel button
-    document.getElementById('cancel-expense').addEventListener('click', () => {
-        document.getElementById('add-expense-modal').style.display = 'none';
-    });
-
-    // Confirm add
-    document.getElementById('confirm-expense').addEventListener('click', async () => {
-        const category = document.getElementById('expense-category').value;
-        const amount = parseFloat(document.getElementById('expense-amount').value);
-        const classification = document.getElementById('expense-classification').value;
-        const date = document.getElementById('expense-date').value;
-
-        if (!amount || isNaN(amount)) {
-            alert("Please enter a valid amount.");
-            return;
-        }
-
-        try {
-            await db.finances.add({ userId, category, amount, classification, date });
-            alert("Expense added!");
-            document.getElementById('add-expense-modal').style.display = 'none';
-            // renderExpenses();
-        } catch (err) {
-            console.error(err);
-            alert("Error saving expense.");
-        }
-    });
-
-</script>
+    </script>
+    
+    
     
 </body>
 </html>
