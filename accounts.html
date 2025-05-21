@@ -125,7 +125,7 @@
             border-radius: 15px;
             padding: 20px;
             display: flex;
-            justify-content: space-between;
+            /* justify-content: space-between; */
             align-items: center;
         }
 
@@ -156,6 +156,8 @@
             font-size: 18px;
             color: #3aa1af;
             font-weight: 500;
+            margin-left: 65px;
+            margin-right: 15px;
         }
 
         /* Saving Goal View Styles */
@@ -180,12 +182,12 @@
         }
 
         .bottle-container {
-            /* position: relative; */
+            position: relative;
             width: 200px;
             height: 350px;
             margin: 0 auto;
             padding-bottom:  5px;
-            display: flex;
+            /* display: flex; */
         
         }
 
@@ -193,6 +195,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            margin-left: 50px;
         }
 
         .goal-name {
@@ -207,15 +210,18 @@
             /* left: 0; */
             display: flex;
             align-items: center;
-            margin-top: 120px;
-            width: 150px;
+            /* padding-top: 30px; */
+            /* margin-top: 120px; */
+            /* width: 150px; */
         }
 
         .progress-amount {
             font-size: 18px;
             font-weight: 500;
-            color: #ff6b6b;
-            margin-right: 10px;
+            margin-top: 20px;
+            margin-left: 60px;
+            /* color: #ff6b6b; */
+            /* margin-right: 10px; */
         }
 
         .progress-arrow {
@@ -384,7 +390,7 @@
         .water-fill {
         position: absolute;
         bottom: 0;
-        left: 3px;
+        left: 53px;
         width: 90%;
         background-color: rgba(0, 174, 239, 0.5); /* light blue */
         height: 0%;
@@ -400,11 +406,69 @@
         z-index: 2;
         }
 
-        .goal-progress{
-            position: absolute;
-        }
+       
 
+    .add-to-account-button {
+        background-color: #3aa1af;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50%;
+        height: 45px;
+        width: 45px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+    }
 
+    .save-button {
+        background: linear-gradient(135deg, #8ecae6, #e0c3fc);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        width: 50%;
+    }
+
+    .cancel-button {
+        background-color: #f5f5f5;
+        color: #666;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        width: 40%;
+    }
+
+    #new-amount, .add-more-amount {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    .goal-label{
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .goal-edit-title{
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: space-between;
+       
+    }
     /* .bottle-outer {
         position: relative;
         width: 100px;
@@ -497,15 +561,17 @@
                     </div> -->
 
                     <div class="bottle-container">
-                        <div class="goal-progress">
-                          <div class="progress-amount" id="progress-amount">R 0</div>
-                          <div class="progress-arrow">→</div>
-                        </div>
+                        
                       
                         <div class="bottle-wrapper">
                           <img src="assets/water-bottle.png" alt="Savings Bottle" class="bottle-image">
                           <div class="water-fill" id="water-fill"></div>
                         </div>
+
+                        <div class="goal-progress">
+                            <div class="progress-amount" id="progress-amount">R 0</div>
+                            <!-- <div class="progress-arrow">→</div> -->
+                          </div>
                       </div>
                       
 
@@ -606,12 +672,12 @@
     <!-- Update saving goal progress -->
     <div id="update-modal" class="modal hidden">
         <div class="modal-content">
-          <h2>Update Savings Amount</h2>
+          <h2 class="goal-edit-title">Update Savings Amount</h2>
           <form id="update-goal-form">
-            <label for="new-amount">Enter new amount saved:</label>
+            <label class="goal-label" for="new-amount">Enter new amount saved:</label>
             <input type="number" id="new-amount" required>
             <div class="modal-buttons">
-              <button type="submit" class="save-button">Save</button>
+              <button type="submit" class="save-button" >Save</button>
               <button type="button" class="cancel-button" id="cancel-update">Cancel</button>
             </div>
           </form>
@@ -622,13 +688,13 @@
     <!-- Update acounts -->
     <div id="add-to-account-modal" class="modal hidden">
         <div class="modal-content">
-          <h2>Add to Account</h2>
+          <h2 class="goal-edit-title">Add to Account</h2>
           <form id="add-to-account-form">
-            <input type="number" id="add-amount" placeholder="Enter amount to add" required>
+            <input type="number" class="add-more-amount" id="add-amount" placeholder="Enter amount to add" required>
             <input type="hidden" id="account-id">
-            <div class="modal-actions">
-              <button type="submit">Add</button>
-              <button type="button" id="cancel-add">Cancel</button>
+            <div class="modal-actions " style="margin-top: 20px;"> 
+              <button class="save-button" type="submit">Add</button>
+              <button class="cancel-button" type="button" id="cancel-add">Cancel</button>
             </div>
           </form>
         </div>

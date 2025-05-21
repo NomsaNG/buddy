@@ -137,7 +137,7 @@ async function loadAccounts() {
                 <div class="account-name">${account.name}</div>
             </div>
             <div class="account-balance">R ${account.amount}</div>
-            <button class="add-to-account-button" data-id="${account.id}">+ Add</button>
+            <button class="add-to-account-button" data-id="${account.id}">+</button>
         `;
         if (account.isVirtual) {
             card.style.opacity = 0.6;
@@ -227,7 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
     document.getElementById('cancel-update').addEventListener('click', () => {
         console.log('cancel button clicked');
-        document.getElementById('update-modal').classList.add('hidden');
+        editGoalModal.style.display = 'none';
+        
     });
   
     document.getElementById('update-goal-form').addEventListener('submit', async (e) => {
