@@ -1,7 +1,7 @@
 const CACHE_NAME = 'mybuddy-cache-v1';
 const urlsToCache = [
   '/',
-  '/splash.html',
+  '/index.html',
   '/login.html',
   '/signup.html',
   '/home.html',

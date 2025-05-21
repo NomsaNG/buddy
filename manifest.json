@@ -1,7 +1,7 @@
 {
     "name": "MyBuddyApp",
     "short_name": "Buddy",
-    "start_url": "splash.html",
+    "start_url": "index.html",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#3c6255",
