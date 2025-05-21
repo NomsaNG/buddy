@@ -69,7 +69,7 @@ mybuddyapp/
 ├── manifest.json              # (Optional) Web app manifest for PWA support
 ├── service-worker.js          # (Optional) Service worker for offline support and caching
 └── README.md                  # Project documentation
-
+```
 
 ## 📦 Dexie.js Schema
 
